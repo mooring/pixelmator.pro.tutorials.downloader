@@ -7,6 +7,8 @@ Download Pixcelmator Pro Tutorial to local
 
 
 ### Tampermonkey Assistant avaiable here: https://greasyfork.org/en/scripts/462719-pixelmatortutorialdownloader
+![assistant](https://user-images.githubusercontent.com/1917297/228027130-d52eb51f-45e2-43b2-9bf8-fa8b999127d6.jpg)
+
 
 ### Already downloaded tutorials (packed as ISO file)
 
