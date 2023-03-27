@@ -38,4 +38,6 @@ mount the iso file , then Open Readme.html with your browser
 ![readme](https://user-images.githubusercontent.com/1917297/228026300-13513c2f-cc40-493a-a254-aa7a2e32c22a.jpg)
 ![video](https://user-images.githubusercontent.com/1917297/228026368-45acdec1-7480-40bb-957f-512823edf8ef.jpg)
 ![pixelmator](https://user-images.githubusercontent.com/1917297/228026446-8f072588-6756-4a32-98bb-8287507b9a81.jpg)
+![struct2](https://user-images.githubusercontent.com/1917297/228029953-71fe5a4c-4269-4a0f-89bd-399906c61b0b.jpg)
+
 
