@@ -108,6 +108,7 @@ void writeHtmlHead(FILE *fp, char *title){
     fprintf(fp, "%s\n", "<meta name='description' content = 'Pixelmator Pro Tutorial' />");
     fprintf(fp, "%s\n", "<meta name='viewport' content = 'width=device-width,initial-scale=1' />");
     fprintf(fp, "%s\n", "<link rel='stylesheet' type='text/css' href='../../assets/styles.css' />");
+    fprintf(fp, "%s\n", "<script type='text/javascript' src='../../assets/jquery.min.js'></script>");
     fprintf(fp, "%s\n", "<script type='text/javascript' src='../../assets/fixvideo.js'></script>");
     fprintf(fp, "%s\n", "</head><body>");
 }
