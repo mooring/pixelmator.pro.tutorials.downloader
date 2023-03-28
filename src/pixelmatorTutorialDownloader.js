@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.05
+// @version      0.06
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
 // @match        https://www.pixelmator.com/tutorials/*
@@ -25,7 +25,6 @@ function getCategoryInfo(cmd, collect, init){
     }
     if(init){
         commands.push('cls');
-        commands.push('@set pwd=%25~dp0');
         commands.push('@set getpage=%25~dp0\\..\\getpage.exe');
         commands.push(`@echo @set down=..\\yt-dlp --write-thumbnail  --embed-metadata  --cache-dir cache --write-link -f "bv[ext=mp4]+ba[ext=m4a]" --progress ${proxy?'--proxy "'+proxy+'"':''} --no-playlist --restrict-filenames --write-subs --audio-quality 10 --merge-output-format "mp4/mkv" --sub-langs "en-US.*,zh-Hans.*" --convert-thumbnails png  --ffmpeg-location ..\\ ${init?'>':'>>'} %25~dp0\\${collect||category}_ytb.cmd`);
         html.push(`<!doctype html>`);
@@ -48,6 +47,7 @@ function getCategoryInfo(cmd, collect, init){
         html.push(`<script>`);
         html.push(`function viewVideo(evt,url){ var img=new Image(); img.onerror=function(){window.open(url.replace("video.mp4","index.html"))};img.onload=function(){window.open(url)};img.src=url.replace(".mp4",".png");}`);
         html.push(`</script></head><body>`);
+        commands.push(`@echo ${proxy||'.'} > "%25~dp0\\assets\\proxy.conf"`);
         commands.push(`@echo @echo tutorial resource downloader ${init?'>':'>>'} %25~dp0\\${collect||category}_res.cmd`);
     }
     commands.push(`@if not exist ${category} mkdir ${category}`);
@@ -84,7 +84,7 @@ function getCategoryInfo(cmd, collect, init){
     if(items.length>0){
         html.push(`</div>`);
     }
-    commands.push('@cd %25pwd%25');
+    commands.push('@cd %25~dp0');
     if(collect){
         return {category, commands, html}
     }else{

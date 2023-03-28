@@ -1,7 +1,7 @@
 cls
-@set pwd=%~dp0
 @set getpage=%~dp0\..\getpage.exe
 @echo @set down=..\yt-dlp --write-thumbnail  --embed-metadata  --cache-dir cache --write-link -f "bv[ext=mp4]+ba[ext=m4a]" --progress --proxy "http://127.0.0.1:15236" --no-playlist --restrict-filenames --write-subs --audio-quality 10 --merge-output-format "mp4/mkv" --sub-langs "en-US.*,zh-Hans.*" --convert-thumbnails png  --ffmpeg-location ..\ > %~dp0\Resources_ytb.cmd
+@echo http://127.0.0.1:15236 > "%~dp0\assets\proxy.conf"
 @echo @echo tutorial resource downloader > %~dp0\Resources_res.cmd
 @if not exist Automation mkdir Automation
 @cd Automation
@@ -29,7 +29,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/guides/batch-process-images-with-pixelmator-pro/thumb-batch_process_images--v1@2x.jpg
 @curl -o "batch-process-images-using-the-automator-app-and-pixelmator-pro\img\thumb-batch_process_images--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/guides/batch-process-images-with-pixelmator-pro/thumb-batch_process_images--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/batch-process-images-using-the-automator-app-and-pixelmator-pro/" "Automation\batch-process-images-using-the-automator-app-and-pixelmator-pro" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Basics mkdir Basics
 @cd Basics
 @if not exist "how-to-remove-green-screens-from-videos\img" mkdir "how-to-remove-green-screens-from-videos\img"
@@ -206,7 +206,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/guides/pixels-explained/thumb-pixels_explained--v1@2x.jpg
 @curl -o "pixels-explained\img\thumb-pixels_explained--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/guides/pixels-explained/thumb-pixels_explained--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/pixels-explained/" "Basics\pixels-explained" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Design mkdir Design
 @cd Design
 @if not exist "create-pixel-perfect-digital-designs\img" mkdir "create-pixel-perfect-digital-designs\img"
@@ -443,7 +443,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/video/add-text/thumb_add-text--v1@2x.jpg
 @curl -o "how-to-add-text-to-your-image\img\thumb_add-text--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/video/add-text/thumb_add-text--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/how-to-add-text-to-your-image/" "Design\how-to-add-text-to-your-image" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Effects mkdir Effects
 @cd Effects
 @if not exist "how-to-create-a-risograph-print-effect\img" mkdir "how-to-create-a-risograph-print-effect\img"
@@ -554,7 +554,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/video/add-a-light-leak-effect/thumb-light_leak--v1@2x.jpg
 @curl -o "add-a-light-leak-to-an-image\img\thumb-light_leak--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/video/add-a-light-leak-effect/thumb-light_leak--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/add-a-light-leak-to-an-image/" "Effects\add-a-light-leak-to-an-image" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Illustration mkdir Illustration
 @cd Illustration
 @if not exist "how-to-create-3d-shapes\img" mkdir "how-to-create-3d-shapes\img"
@@ -599,7 +599,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/guides/drawing-into-a-digital-illustration/thumb_artwork--v1@2x.jpg
 @curl -o "turn-a-real-life-drawing-into-a-digital-illustration\img\thumb_artwork--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/guides/drawing-into-a-digital-illustration/thumb_artwork--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/turn-a-real-life-drawing-into-a-digital-illustration/" "Illustration\turn-a-real-life-drawing-into-a-digital-illustration" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Layers mkdir Layers
 @cd Layers
 @if not exist "how-to-remove-green-screens-from-videos\img" mkdir "how-to-remove-green-screens-from-videos\img"
@@ -638,7 +638,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/guides/about-layers-in-image-editing/thumb-about_layers--v1@2x.jpg
 @curl -o "about-layers-in-image-editing\img\thumb-about_layers--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/guides/about-layers-in-image-editing/thumb-about_layers--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/about-layers-in-image-editing/" "Layers\about-layers-in-image-editing" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Painting mkdir Painting
 @cd Painting
 @if not exist "how-to-create-a-custom-star-brush\img" mkdir "how-to-create-a-custom-star-brush\img"
@@ -653,7 +653,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/video/apply-a-brush-stroke-to-a-path/img_thumbnail--v1@2x.jpg
 @curl -o "how-to-apply-a-brush-stroke-to-a-path\img\img_thumbnail--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/video/apply-a-brush-stroke-to-a-path/img_thumbnail--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/how-to-apply-a-brush-stroke-to-a-path/" "Painting\how-to-apply-a-brush-stroke-to-a-path" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Photography mkdir Photography
 @cd Photography
 @if not exist "smooth-skin-in-photos-and-videos-in-seconds\img" mkdir "smooth-skin-in-photos-and-videos-in-seconds\img"
@@ -830,7 +830,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/video/remove-object/thumb_remove-object--v1@2x.jpg
 @curl -o "how-to-remove-an-object-from-a-photo\img\thumb_remove-object--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/video/remove-object/thumb_remove-object--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/how-to-remove-an-object-from-a-photo/" "Photography\how-to-remove-an-object-from-a-photo" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Popular mkdir Popular
 @cd Popular
 @if not exist "smooth-skin-in-photos-and-videos-in-seconds\img" mkdir "smooth-skin-in-photos-and-videos-in-seconds\img"
@@ -971,7 +971,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/video/remove-object/thumb_remove-object--v1@2x.jpg
 @curl -o "how-to-remove-an-object-from-a-photo\img\thumb_remove-object--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/video/remove-object/thumb_remove-object--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/how-to-remove-an-object-from-a-photo/" "Popular\how-to-remove-an-object-from-a-photo" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Text mkdir Text
 @cd Text
 @if not exist "how-to-create-a-risograph-print-effect\img" mkdir "how-to-create-a-risograph-print-effect\img"
@@ -1040,7 +1040,7 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/video/add-text/thumb_add-text--v1@2x.jpg
 @curl -o "how-to-add-text-to-your-image\img\thumb_add-text--v1@2x.jpg"  "https://pro-cdn.pixelmator.com/tutorials/video/add-text/thumb_add-text--v1@2x.jpg" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/how-to-add-text-to-your-image/" "Text\how-to-add-text-to-your-image" "Resources"
-@cd %pwd%
+@cd %~dp0
 @if not exist Video mkdir Video
 @cd Video
 @if not exist "smooth-skin-in-photos-and-videos-in-seconds\img" mkdir "smooth-skin-in-photos-and-videos-in-seconds\img"
@@ -1067,4 +1067,4 @@ cls
 @echo downloading https://pro-cdn.pixelmator.com/tutorials/video/quick-guide-to-editing-evideos-in-pixelmator-pro/img_thumbnail--v1@2x.png
 @curl -o "a-quick-guide-to-editing-videos-in-pixelmator-pro\img\img_thumbnail--v1@2x.png"  "https://pro-cdn.pixelmator.com/tutorials/video/quick-guide-to-editing-evideos-in-pixelmator-pro/img_thumbnail--v1@2x.png" 2>NUL
 @%getpage% "https://www.pixelmator.com/tutorials/a-quick-guide-to-editing-videos-in-pixelmator-pro/" "Video\a-quick-guide-to-editing-videos-in-pixelmator-pro" "Resources"
-@cd %pwd%
+@cd %~dp0

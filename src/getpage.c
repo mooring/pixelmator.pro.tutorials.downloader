@@ -10,6 +10,8 @@
 #define MAX_LINE 512
 #define MAX_IMGS 20
 
+char proxyConf[128] = {0};
+
 int getString(char* src, char* find, char ret[]){
     char* prev = strstr(src, find) + strlen(find) + 2;
     char* dblq = strpbrk(prev, "\"<");
@@ -41,7 +43,12 @@ int getTextTutorial(
     int i = 0, j = 0, k = 0, len = 0;
     int start = 0, matched = 0, find = 0;
     
-    sprintf(curlcmd, "curl \"%s\" 2>NUL", url);
+    sprintf(
+        curlcmd, 
+        "curl %s \"%s\" 2>NUL",
+        strlen(proxyConf) ? proxyConf : "",
+        url
+    );
     fp = popen(curlcmd, "r");
     if (fp == NULL) {
         perror("initial request error");
@@ -109,7 +116,8 @@ void generateHTML(char* fold, char urls[][256], int urlCount, char *title, char 
         memcpy(rescmd, url + len, strlen(url));
         sprintf(
             curlcmd,
-            "curl --proxy -o \"..\\%s\\img%s\" \"%s\" 2>NUL",
+            "curl %s -o \"..\\%s\\img%s\" \"%s\" 2>NUL",
+            strlen(proxyConf) ? proxyConf : "",
             fold, rescmd, fullurl
         );
         printf("downloading %s\n", fullurl);
@@ -162,7 +170,12 @@ int parsePage(char *url, char find[][100], char info[3][1024])
     char *fstr;
     FILE *fp = NULL;
     
-    sprintf(cmd, "curl \"%s\" 2>NUL", url);
+    sprintf(
+        cmd, 
+        "curl %s \"%s\" 2>NUL",
+        strlen(proxyConf) ? proxyConf : "",
+        url
+    );
     printf("parsing %s\n", url);
     fp = popen(cmd, "r");
     if(fp == NULL){
@@ -201,9 +214,10 @@ int main(int argc, char* argv[])
     char resource[1024] = {0};
     char rescmd[100]    = {0};
     char ytbcmd[100]    = {0};
+    char proxy[150]     = {0};
     int i = 0;
     char *ps = NULL;
-    FILE *fp = NULL, *yp = NULL;
+    FILE *fp = NULL, *yp = NULL, *pp = NULL;
     strcpy(rescmd, "../youtube.cmd");
     if(argc >= 2 && strstr(argv[1], "pixelmator.com")){
         strcpy(url, argv[1]);
@@ -220,26 +234,33 @@ int main(int argc, char* argv[])
         strcat(ytbcmd, "_ytb.cmd");
     }
     printf("geting Tutorial\nurl=%s\nout=%s\n", url, out);
-    printf("resource download script is %s\n", rescmd);
-    printf("youtube  download script is %s\n", ytbcmd);
+    // printf("resource download script is %s\n", rescmd);
+    // printf("youtube  download script is %s\n", ytbcmd);
     fp = fopen(rescmd, "a+");
     yp = fopen(ytbcmd, "a+");
-    
-    if( fp == NULL ){perror("open resource download error");return 0;}
-    if( yp == NULL ){perror("open youtube download error");return 0;}
+    pp = fopen("..\\assets\\proxy.conf","r");
+    if(fp == NULL){perror("open resource download error");return 0;}
+    if(yp == NULL){perror("open youtube download error");return 0;}
+    if(pp != NULL){
+        fscanf(pp, "%s", proxy);
+        sprintf(proxyConf, "--proxy \"%s\"", proxy);
+        printf("proxy=%s\n", proxyConf);
+        fclose(pp);
+    }
     parsePage(url, find, info);
-
     // tutorial has resource file
     if(strlen(info[2])){
         sprintf(
             resource,
-            "curl -o \"%s\\%s\" \"%sm/%s\"",
+            "curl %s -o \"%s\\%s\" \"%sm/%s\"",
+            strlen(proxyConf) ? proxyConf : "",
             strchr(out,'\\')+1, info[2],
             find[2], info[2]
         );
         fprintf(
             fp,
-            "curl -o \"%s\\%s\" \"%sm/%s\"\n",
+            "curl %s -o \"%s\\%s\" \"%sm/%s\"\n",
+            strlen(proxyConf) ? proxyConf : "",
             out, info[2],
             find[2], info[2]
         );
