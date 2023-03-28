@@ -13,8 +13,8 @@ Download Pixcelmator Pro Tutorial to local
 ### Already downloaded tutorials (packed as ISO file)
 
 ### Baidu Cloud Share
-- BaiduCloud：[https://pan.baidu.com/s/1Ego89hnrsjFCZsOfxi4YmQ?pwd=gtdb](https://pan.baidu.com/s/1Ego89hnrsjFCZsOfxi4YmQ?pwd=gtdb)
-- Password：gtdb 
+- BaiduCloud：[https://pan.baidu.com/s/1i3kkCFNwoMn9SLgCNBEY5w?pwd=m0vk](https://pan.baidu.com/s/1i3kkCFNwoMn9SLgCNBEY5w?pwd=m0vk)
+- Password：m0vk
 
 ### Tencent Cloud Share
 - TencentCloud: [https://share.weiyun.com/LTr2u9J4](https://share.weiyun.com/LTr2u9J4)
