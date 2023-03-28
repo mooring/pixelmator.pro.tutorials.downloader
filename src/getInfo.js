@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.02
+// @version      0.05
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
 // @match        https://www.pixelmator.com/tutorials/*
@@ -46,16 +46,12 @@ function getCategoryInfo(cmd, collect, init){
         html.push(`img.image-x2 {width: 100%;height: 100%;border-radius: 1em;}`);
         html.push(`</style>`);
         html.push(`<script>`);
-        html.push(`function viewVideo(evt,url){ var img=new Image(); img.onerror=function(){evt.nextElementSibling.click()};img.onload=function(){window.open(url)};img.src=url.replace(".mp4",".png");}`);
+        html.push(`function viewVideo(evt,url){ var img=new Image(); img.onerror=function(){window.open(url.replace("video.mp4","index.html"))};img.onload=function(){window.open(url)};img.src=url.replace(".mp4",".png");}`);
         html.push(`</script></head><body>`);
         commands.push(`@echo @echo tutorial resource downloader ${init?'>':'>>'} %25~dp0\\${collect||category}_res.cmd`);
     }
     commands.push(`@if not exist ${category} mkdir ${category}`);
     commands.push(`@cd ${category}`);
-    commands.push(`@echo. ${init?'>':'>>'} ..\\pages.md`);
-    commands.push(`@echo Just text tutorial Pages of ${category} >> ..\\pages.md`);
-    commands.push(`@echo -------------------------------------------------- >> ..\\pages.md`);
-    commands.push(`@echo. >> ..\\pages.md`);
     let items = document.querySelectorAll('.tutorialsBrowser__mainCategoryList >.tutorialsBrowser__mainItem');
     items.forEach((item,index)=>{
         let img = item.querySelector('.tutorialsThumbnail__image');
