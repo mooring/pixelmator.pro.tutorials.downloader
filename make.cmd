@@ -22,13 +22,15 @@ if not exist src/getpage.c (
     pause & color & title=%comspec%
     goto :EOF
 )
-cl /nologo /W2 /Fo%obj_folder%\getpage.obj /Fe%bin_folder%/getpage.exe src/getpage.c
+taskkill /f /im getpage.exe 2>NUL >NUL
+cl /nologo /W2 /Fo%obj_folder%\getpage.obj /Fe%bin_folder%getpage.exe src\getpage.c
 if %errorlevel% equ 0 (
     rem cls
-    color 03
+    color 02
     title success
     pause & color & title=%comspec%
 ) else (
+    color 04
     title compile error
     echo bad news & echo.
     pause & color & title=%comspec%

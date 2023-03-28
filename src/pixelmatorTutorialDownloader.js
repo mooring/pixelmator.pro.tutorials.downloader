@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.06
+// @version      0.08
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
 // @match        https://www.pixelmator.com/tutorials/*
@@ -75,9 +75,9 @@ function getCategoryInfo(cmd, collect, init){
         html.push(`</div>`);
         html.push(`<div class="title" onclick="window.open('${lnk}','_blank')">${tit}</div>`);
         html.push(`</div>`);
-        commands.push(`@echo downloading ${encodeURI(src.join('/'))}`);
+        commands.push(`@rem downloading ${encodeURI(src.join('/'))}`);
         commands.push(`@curl -o "${pth}\\img\\${src.slice(-1)[0]}" "${encodeURI(src.join('/')).replace(/%/g,'%%')}" 2>NUL`);
-        commands.push(`@echo downloading ${encodeURI(x2.join('/').split(' ')[0])}`);
+        commands.push(`@rem downloading ${encodeURI(x2.join('/').split(' ')[0])}`);
         commands.push(`@curl -o "${pth}\\img\\${x2.slice(-1)[0].split(' ')[0]}"  "${encodeURI(x2.join('/').split(' ')[0]).replace(/%/g,'%%')}" 2>NUL`);
         commands.push(`@%25getpage%25 "${lnk}" "${category}\\${pth}" "${collect||category}"`);
     });
@@ -106,7 +106,7 @@ function collect(cmd){
     let commands = [];
     let cmdfile  = 'Resources';
     let categories = document.querySelectorAll('.tutorialsBrowser__categoriesItem> .tutorialsBrowser__categoriesLink');
-    let lproxy = localStorage.getItem('archiveAssistant_proxy');
+    let lproxy = localStorage.getItem('pixelmatorTutorialDownloader_proxy');
     if(cmd=='cmd'){
         proxy = prompt("Input proxy string like http://127.0.0.1:8899, if no proxy keep it empty", lproxy || '');
         localStorage.setItem('archiveAssistant_proxy', proxy||'');
@@ -132,6 +132,7 @@ function collect(cmd){
         collect('html');
     });
     GM_registerMenuCommand("get Command", function(evt, keybord){
+        let lproxy = localStorage.getItem('pixelmatorTutorialDownloader_proxy');
         proxy = prompt("Input proxy string like http://127.0.0.1:8899, if no proxy keep it empty", lproxy || '');
         localStorage.setItem('archiveAssistant_proxy', proxy||'');
         getCategoryInfo('cmd', false, true);
