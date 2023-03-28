@@ -1,4 +1,5 @@
 @echo off
+cls
 set obj_folder=%~dp0obj
 set bin_folder=%~dp0
 where cl >NUL 2>&1 1>NUL 

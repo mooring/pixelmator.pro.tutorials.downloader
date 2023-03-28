@@ -19,7 +19,48 @@ int getString(char* src, char* find, char ret[]){
     sprintf(ret, "%s", prev);
     return 0;
 }
-
+void extractUrls(
+    const char* beg[],
+    const int   blength,
+    const char* end[],
+    const int   elength,
+    int   *start,
+    char  urls[][256],
+    char  tline[]
+)
+{
+    char line[2048]  = { 0 };
+    int  i = 0, j = 0, k = *start, len = 0, find = 0;
+    char *next = NULL, *ps = NULL, *pe = NULL;
+    strcpy(line, tline); 
+    for (i = 0; i < blength; i++) {
+        find = 0;
+        ps = strstr(tline, beg[i]);
+        if (ps) {
+            puts(tline);
+            next = ps + strlen(beg[i]);
+            //printf("beg[%d]=>>%s<<\nps=%s\nnex=>%s\n", i, beg[i],ps, next);
+            for (j = 0; j < elength; j++) {
+                pe = strstr(next, end[j]);
+                if (!find && pe) {
+                    len = pe + strlen(end[j]) - next;
+                    strcpy(urls[k],  next);
+                    urls[k][len] = 0;
+                    printf("resouces[%d]=%s\n", k, urls[k]);
+                    ps = strstr(tline, urls[k]);
+                    len = strrchr(urls[k], '/') - urls[k];
+                    memcpy(ps, "./img", 5);
+                    memcpy(ps+5, ps+len, strlen(ps+len));
+                    *(ps+5+strlen(ps+len)) = 0;
+                    k++;
+                    find = 1;
+                }
+            }
+            *start += k;
+        }
+    }
+    puts(tline);
+}
 int getTextTutorial(
     const char* url,
     const char* fold,
@@ -55,7 +96,6 @@ int getTextTutorial(
         if (strstr(line, mst) != NULL) {
             start = 1;
         }
-        //printf("60:%s\n", line);
         if (start && !matched) {
             strcpy(tline, line);
             for (i = 0; i < blength; i++) {
@@ -81,12 +121,6 @@ int getTextTutorial(
                     }
                 }
             }
-            // if(strlen(tline)!=strlen(line)){
-                // printf(
-                    // "%d---%d\n%d:%s\n%d:%s\n=======================================\n", 
-                    // start, matched, strlen(tline), tline, strlen(line), line
-                // );
-            // }
             fprintf(hp, "%s", tline);
             if (strstr(tline, med) != NULL) {
                 matched = 1;
