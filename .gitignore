@@ -1,2 +1,6 @@
 **/obj
 **/ffmpeg.exe
+**/.vs/
+**/.idea/
+**/.history/
+**/.vscode/

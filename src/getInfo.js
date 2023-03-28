@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.01
+// @version      0.02
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
-// @match        https://www.pixelmator.com/*
+// @match        https://www.pixelmator.com/tutorials/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=pixelmator.com
 // @run-at       document-end
 // @grant        GM_registerMenuCommand
