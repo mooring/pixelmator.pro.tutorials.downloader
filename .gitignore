@@ -19,4 +19,5 @@
 */*/*.md
 **/*_res.cmd
 **/*_ytb.cmd
+**/*.cmd
 **/*.bak*
