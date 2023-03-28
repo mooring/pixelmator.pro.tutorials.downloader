@@ -286,10 +286,13 @@ int main(int argc, char* argv[])
         fclose(yp);
         sprintf(
             download,
-            "%s "
+            "%s %s"
             "-o %s\\video.mp4 "
             "\"https://www.youtube.com/watch?v=%s\"\n",
-            ytd, strchr(out,'\\')+1, info[1]
+            ytd, 
+            strlen(proxyConf) ? proxyConf : "",
+            strchr(out,'\\')+1, 
+            info[1]
         );
         if(argc >= 5){
             printf("downloading https://www.youtube.com/watch?v=%s\n", info[1]);
