@@ -34,7 +34,6 @@ int getTextTutorial(
 )
 {
     char curlcmd[256] = { 0 };
-    char rescmd[512] = { 0 };
     char line[2048] = { 0 };
     char tline[2048] = { 0 };
     FILE *fp = NULL;
@@ -73,9 +72,9 @@ int getTextTutorial(
                             find = 1;
                             ps = strstr(tline, urls[k]);
                             len = strrchr(urls[k], '/') - urls[k];
-                            strcpy(rescmd, "./img");
-                            memcpy(ps, rescmd, strlen(rescmd));
-                            memcpy(ps+strlen(rescmd), ps + len, strlen(ps));
+                            memcpy(ps, "./img", 5);
+                            memcpy(ps+5, ps+len, strlen(ps+len));
+                            *(ps+5+strlen(ps+len)) = 0;
                             k++;
                             break;
                         }
