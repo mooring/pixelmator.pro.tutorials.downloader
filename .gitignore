@@ -21,3 +21,4 @@
 **/*_ytb.cmd
 **/*.cmd
 **/*.bak*
+/web/*.html
