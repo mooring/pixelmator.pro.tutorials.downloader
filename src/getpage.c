@@ -147,7 +147,7 @@ void prepareTextTuroial(char *url, char *fold, char *title)
     const char* mst = "<section class=";
     const char* med = "</section>";
     const char* beg[] = { "src=\"","srcset=\"", "href=\""};
-    const char* end[] = { ".png", ".jpg", ".gif", ".mov", ".mp4"}; //, ".zip"
+    const char* end[] = { ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip"};
     char text[512000] = { 0 };
     char urls[MAX_IMGS][256] = { 0 };
 
