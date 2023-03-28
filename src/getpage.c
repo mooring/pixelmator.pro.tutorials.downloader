@@ -100,11 +100,12 @@ int getTextTutorial(
             strcpy(tline, line);
             for (i = 0; i < blength; i++) {
                 find = 0;
-                if ((ps=strstr(tline, beg[i]))!=NULL) {
+                ps = strstr(tline, beg[i]);
+                if (ps) {
                     next = ps + strlen(beg[i]);
                     for (j = 0; j < elength; j++) {
                         pe = strstr(next, end[j]);
-                        if (!find && pe != NULL) {
+                        if (!find && pe) {
                             len = pe + strlen(end[j]) - next + 1;
                             strcpy(urls[k],  next);
                             urls[k][len - 1] = 0;
@@ -128,6 +129,7 @@ int getTextTutorial(
         }
     }
     pclose(fp);
+    // return 0;
     //printf("Text=%s\n", text);
     return k;
 }
