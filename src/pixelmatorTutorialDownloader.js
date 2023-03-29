@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.09
+// @version      0.12
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
 // @match        https://www.pixelmator.com/tutorials/*
@@ -49,6 +49,8 @@ function getCategoryInfo(cmd, collect, init){
         html.push(`</script></head><body>`);
         commands.push(`@echo ${proxy||'.'} > "%25~dp0\\assets\\proxy.conf"`);
         commands.push(`@echo @echo tutorial resource downloader ${init?'>':'>>'} %25~dp0\\${collect||category}_res.cmd`);
+        commands.push(`@echo @title %25cd%25 >> %25~dp0\\${collect||category}_res.cmd`);
+        commands.push(`@echo @title %25cd%25 >> %25~dp0\\${collect||category}_ytb.cmd`);
     }
     commands.push(`@if not exist ${category} mkdir ${category}`);
     commands.push(`@cd ${category}`);
@@ -75,10 +77,14 @@ function getCategoryInfo(cmd, collect, init){
         html.push(`</div>`);
         html.push(`<div class="title" onclick="window.open('${lnk}','_blank')">${tit}</div>`);
         html.push(`</div>`);
+        let img1 = `${pth}\\img\\${src.slice(-1)[0]}`, 
+            url1 = `${encodeURI(src.join('/')).replace(/%/g,'%%')}`;
         commands.push(`@rem downloading ${encodeURI(src.join('/'))}`);
-        commands.push(`@curl -o "${pth}\\img\\${src.slice(-1)[0]}" "${encodeURI(src.join('/')).replace(/%/g,'%%')}" 2>NUL`);
+        commands.push(`@if not exist "${img1}" @curl -o "${img1}" "${url1}" 2>NUL`);
+        let img2 = `${pth}\\img\\${x2.slice(-1)[0].split(' ')[0]}`, 
+            url2 = `${encodeURI(x2.join('/').split(' ')[0]).replace(/%/g,'%%')}`;
         commands.push(`@rem downloading ${encodeURI(x2.join('/').split(' ')[0])}`);
-        commands.push(`@curl -o "${pth}\\img\\${x2.slice(-1)[0].split(' ')[0]}"  "${encodeURI(x2.join('/').split(' ')[0]).replace(/%/g,'%%')}" 2>NUL`);
+        commands.push(`@if not exist "${img2}" @curl -o "${img2}" "${url2}" 2>NUL`);
         commands.push(`@%25getpage%25 "${lnk}" "${category}\\${pth}" "${collect||category}"`);
     });
     if(items.length>0){
@@ -125,19 +131,19 @@ function collect(cmd){
 
 (function() {
     'use strict';
-    GM_registerMenuCommand("get All Cmd", function(evt, keybord){
+    GM_registerMenuCommand("get All Command", function(evt, keybord){
         collect('cmd');
     });
     GM_registerMenuCommand("get All HTML", function(evt, keybord){
         collect('html');
     });
-    GM_registerMenuCommand("get Command", function(evt, keybord){
+    GM_registerMenuCommand("get Category Command", function(evt, keybord){
         let lproxy = localStorage.getItem('pixelmatorTutorialDownloader_proxy');
         proxy = prompt("Input proxy string like http://127.0.0.1:8899, if no proxy keep it empty", lproxy || '');
         localStorage.setItem('archiveAssistant_proxy', proxy||'');
         getCategoryInfo('cmd', false, true);
     });
-    GM_registerMenuCommand("get HTML", function(evt, keybord){
+    GM_registerMenuCommand("get Category HTML", function(evt, keybord){
         getCategoryInfo('html', false, true);
     });
 })();

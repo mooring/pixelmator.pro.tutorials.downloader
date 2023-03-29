@@ -324,6 +324,11 @@ int main(int argc, char* argv[])
         );
         fprintf(
             fp,
+            "@echo dowloading %sm/%s\n",
+            find[2], info[2]
+        );
+        fprintf(
+            fp,
             "@if not exist \"%s\\%s\" "
             "curl %s -o \"%s\\%s\" \"%sm/%s\"\n",
             output, info[2], 
