@@ -1,18 +1,6 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "getpage.h"
 
-#if defined(_WIN32) || defined(_WIN64)
-    #define popen  _popen
-    #define pclose _pclose
-#endif
-
-#define MAX_IMGS 50
-#define URL_CHRS 256
-#define MAX_LINE 512
-#define TXT_CHRS 4096
-
-char proxyConf[128] = {0};
+char proxyConf[PXY_CHRS] = {0};
 
 int getString(char* src, char* find, char ret[])
 {
@@ -24,16 +12,16 @@ int getString(char* src, char* find, char ret[])
 }
 
 void extractUrls(
-    const char* beg[],
+    const char  *beg[],
     const int   blength,
-    const char* end[],
+    const char  *end[],
     const int   elength,
-    int* start,
-    char  urls[][URL_CHRS],
-    char  nline[]
+    int         *start,
+    char        urls[][URL_CHRS],
+    char        nline[]
 )
 {
-    char line[TXT_CHRS] = {0};
+    char line[TXT_CHRS]  = {0};
     int  i = 0, j = 0, k = *start, len = 0, find = 0;
     char *next = NULL, *ps = NULL, *pe = NULL, *lp = NULL;
     strcpy(line, nline);
@@ -56,13 +44,13 @@ void extractUrls(
                     memcpy(ps + 5, ps + len, strlen(ps + len));
                     // strip out addition text from source code
                     *(ps + 5 + strlen(ps + len)) = 0;
-                    k++;
                     //back loop up for next search token
                     if (strstr(next, beg[i])) {
                         lp = next;
                         i--;
                     }
                     find = 1;
+                    k++;
                 }
             }
             *start = k;
@@ -71,28 +59,28 @@ void extractUrls(
     strcpy(nline, line);
 }
 int getTextTutorial(
-    const char* url,
-    const char* fold,
-    const char* mst,
-    const char* med,
-    const char* beg[],
-    const int   blength,
-    const char* end[],
-    const int   elength,
-    FILE  *hp,
-    char  urls[][URL_CHRS]
+    const char *url,
+    const char *fold,
+    const char *mst,
+    const char *med,
+    const char *beg[],
+    const int  blength,
+    const char *end[],
+    const int  elength,
+    FILE       *hp,
+    char       urls[][URL_CHRS]
 )
 {
     FILE *fp = NULL;
-    char curlcmd[URL_CHRS] = {0};
-    char line[TXT_CHRS] = {0};
+    char curlcmd[URL_CHRS]  = {0};
+    char line[TXT_CHRS]     = {0};
     int  start = 0, matched = 0, k = 0;
     sprintf(
         curlcmd, "curl %s \"%s\" 2>NUL",
         strlen(proxyConf) ? proxyConf : "", url
     );
     fp = popen(curlcmd, "r");
-    if (fp == NULL) {perror("initial request error");return 1;}
+    if (fp == NULL) {perror("initial request error");return OPEN_ERR;}
     while (fgets(line, sizeof(line), fp) != NULL) {
         if (start && matched) {break;}
         if (strstr(line, mst) != NULL) {start = 1;}
@@ -131,34 +119,38 @@ void writeHTMLEnd(FILE *fp)
 
 void downloadResources(char* fold, char urls[][URL_CHRS], int urlCount) 
 {
-    char rescmd[256] = {0};
-    char curlcmd[1024] = {0};
+    char fname[CMD_CHRS]   = {0};
+    char curlcmd[CMD_CHRS] = {0};
     char fullurl[URL_CHRS] = {0};
-    char url[URL_CHRS] = {0};
-    int  i = 0, j = 0, len;
+    char resurl[URL_CHRS]  = {0};
+    int  i = 0, j = 0, len = 0;
     for (i = 0; i < urlCount; i++) {
-        strcpy(url, urls[i]);
-        len = strrchr(url, '/') - url;
+        strcpy(resurl, urls[i]);
+        len = strrchr(resurl, '/') - resurl;
         sprintf(
             fullurl,
             "%s%s", 
-            strstr(url, "://") != NULL ? "" : "https:",
-            url
+            strstr(resurl, "://") != NULL ? "" : "https:",
+            resurl
         );
-        memcpy(rescmd, url + len + 1, strlen(url));
+        memcpy(fname, resurl + len + 1, strlen(resurl));
         sprintf(
             curlcmd,
+            "@if not exist \"..\\%s\\img\\%s\" "
             "curl %s -o \"..\\%s\\img\\%s\" \"%s\" 2>NUL",
+            fold, fname,
             strlen(proxyConf) ? proxyConf : "",
-            fold, rescmd, fullurl
+            fold, fname, fullurl
         );
         printf("downloading %s\n", fullurl);
         system(curlcmd);
     }
 }
 
-void prepareTextTuroial(char *url, char *fold, char *title)
+void prepareTextTuroial(char *url, char *folder, char *title)
 {
+    FILE  *fp         = NULL;
+    int   urlCount    = 0;
     const char* mst   = "<section class=";
     const char* med   = "</section>";
     const char* beg[] = { "src=\"", "srcset=\"", "x, "};
@@ -166,51 +158,47 @@ void prepareTextTuroial(char *url, char *fold, char *title)
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
         ".png ", ".jpg ", ".gif "
     };
-    FILE *fp          = NULL;
-    int  urlCount     = 0;
-    char rescmd[128]  = {0};
+    char pagefile[CMD_CHRS]       = {0};
     char urls[MAX_IMGS][URL_CHRS] = {0};
     
-    sprintf(rescmd, "..\\%s\\index.html", fold);
-    printf("saving %s\\index.html\n", fold);
-    fp = fopen(rescmd, "w");
-    if(fp == NULL){perror("write index.html");return;}
+    sprintf(pagefile, "..\\%s\\index.html", folder);
+    printf("saving tutorial to %s\\index.html\n", folder);
+    fp = fopen(pagefile, "w");
+    if(fp == NULL){perror("writing error: index.html");return;}
     writeHtmlHead(fp, title);
     urlCount = getTextTutorial(
-        url, fold, mst, med,
+        url, folder, mst, med,
         beg, sizeof(beg)/sizeof(beg[0]), 
         end, sizeof(end)/sizeof(end[0]),
         fp, urls
     );
     writeHTMLEnd(fp);
     if(urlCount){
-        downloadResources(fold, urls, urlCount);
+        downloadResources(folder, urls, urlCount);
     }
 }
 // parse the pixelmator.com tutorial page
-int parseTutorialPage(char *url, char find[][100], char info[3][512])
+int parseTutorialPage(char *url, char find[][FND_CHRS], char info[][FUD_CHRS])
 {
-    char cmd[1024]   = {0};
-    char line[10240] = {0};
-    char ctx[10240]  = {0};
-    int  i = 0,count = 0;
-    char *fstr;
-    FILE *fp = NULL;
-    char *titlefix = "t-hero-title";
+    int  i     = 0;
+    int  count = 0;
+    char *fstr = NULL;
+    FILE *fp   = NULL;
+    char cmd[CMD_CHRS]  = {0};
+    char line[TXT_CHRS] = {0};
+    char ctx[TXT_CHRS]  = {0};
+    char *titlefix      = "t-hero-title";
     sprintf(
-        cmd, 
+        cmd,
         "curl %s \"%s\" 2>NUL",
         strlen(proxyConf) ? proxyConf : "",
         url
     );
     fp = popen(cmd, "r");
-    if(fp == NULL){
-        perror("init curl error\n");
-        return 1;
-    }
+    if(fp == NULL){perror("init curl error\n");return OPEN_ERR;}
     while(fgets(line, sizeof(line), fp) != NULL){
-        if(count >= 3){break;}
-        for(i=0; i<3; i++){
+        if(count >= FND_GRPS){break;}
+        for(i=0; i<FND_GRPS; i++){
             fstr = find[i];
             memset(ctx, 0, sizeof(ctx));
             memcpy(ctx, line, sizeof(line));
@@ -233,20 +221,21 @@ int parseTutorialPage(char *url, char find[][100], char info[3][512])
 // getpage "https://www.pixelmator.com/tutorials/how-to-create-a-neon-sign-effect/" "Design\how-to-create-a-neon-sign-effect" "Resources"
 int main(int argc, char* argv[])
 {
-    char find[3][100] = {
+    char info[FND_GRPS][FUD_CHRS] = {0};
+    char find[FND_GRPS][FND_CHRS] = {
         "tutorialsVideo__tabsTitle", 
         "https://youtu.b",
         "https://upload-cdn.pixelmator.co"
     };
-    char info[3][512]   = {0};
+    
     char url[URL_CHRS]       = {0};
-    char proxy[128]     = {0};
-    char rescmd[128]    = {0};
-    char ytbcmd[128]    = {0};
-    char youtube[1024] = {0};
-    char resource[1024] = {0};
-    char output[128]    = {"web"};
-    int i = 0;
+    char proxy[PXY_CHRS]     = {0};
+    char rescmd[CMD_CHRS]    = {0};
+    char ytbcmd[CMD_CHRS]    = {0};
+    char youtube[CMD_CHRS]   = {0};
+    char resource[CMD_CHRS]  = {0};
+    char output[CMD_CHRS]    = {"web"};
+    int  i   = 0;
     char *ps = NULL;
     FILE *fp = NULL, *yp = NULL, *pp = NULL;
     if(argc < 3){
@@ -261,10 +250,11 @@ int main(int argc, char* argv[])
         sprintf(ytbcmd, "..\\%s_ytb.cmd", argv[3]);
     }
     printf("\nParsing Tutorial...\nTarget: %s\nOutput: %s\n", url, output);
+    
     fp = fopen(rescmd, "a+");
-    if(fp == NULL){perror("open resource download error");return 0;}
+    if(fp == NULL){perror("open resource download error");return OPEN_ERR;}
     yp = fopen(ytbcmd, "a+");
-    if(yp == NULL){perror("open youtube download error");return 0;}
+    if(yp == NULL){perror("open youtube download error");return OPEN_ERR;}
     pp = fopen("..\\assets\\proxy.conf","r");
     if(pp != NULL){
         fscanf(pp, "%s", proxy);
@@ -272,6 +262,7 @@ int main(int argc, char* argv[])
         printf("Proxy: %s\n", proxyConf);
         fclose(pp);
     }
+    
     parseTutorialPage(url, find, info);
     printf("Title: %s\nYoutube: %s\nResource: %s\n", info[0], info[1], info[2]);
     
@@ -285,15 +276,18 @@ int main(int argc, char* argv[])
             " --ffmpeg-location ..\\..\\";
         sprintf(
             youtube,
+            "@if not exist \"%s\\video.mp4\" "
             "%s %s -o %s\\video.mp4 "
             "\"https://www.youtube.com/watch?v=%s\"\n",
+            strchr(output,'\\') + 1,
             ytd, strlen(proxyConf) ? proxyConf : "",
-            strchr(output,'\\')+1, info[1]
+            strchr(output,'\\') + 1, info[1]
         );
         fprintf(
             yp,
-            "%%down%% -o %s\\video.mp4 \"https://www.youtube.com/watch?v=%s\"\n",
-            output, info[1]
+            "@if not exist \"%s\\video.mp4\" "
+            "%%down%% -o \"%s\\video.mp4\" \"https://www.youtube.com/watch?v=%s\"\n",
+            output, output, info[1]
         );
         if(argc >= 5){
             printf("downloading https://www.youtube.com/watch?v=%s\n", info[1]);
@@ -305,18 +299,22 @@ int main(int argc, char* argv[])
         // text based tutorial
         prepareTextTuroial(url, output, info[0]);
     }
-    fclose(yp);
+    
     // tutorial has resource file
     if(strlen(info[2])){
         sprintf(
             resource,
+            "@if not exist \"%s\\%s\" "
             "curl %s -o \"%s\\%s\" \"%sm/%s\"",
+            strchr(output,'\\')+1, info[2],
             strlen(proxyConf) ? proxyConf : "",
             strchr(output,'\\')+1, info[2], find[2], info[2]
         );
         fprintf(
             fp,
+            "@if not exist \"%s\\%s\" "
             "curl %s -o \"%s\\%s\" \"%sm/%s\"\n",
+            output, info[2], 
             strlen(proxyConf) ? proxyConf : "",
             output, info[2], find[2], info[2]
         );
@@ -328,6 +326,6 @@ int main(int argc, char* argv[])
             printf("preparing %sm/%s\n", find[2], info[2]);
         }
     }
-    fclose(fp);
+    fclose(yp);fclose(fp);
     return 0;
 }
