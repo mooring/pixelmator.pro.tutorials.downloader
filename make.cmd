@@ -2,6 +2,8 @@
 cls
 set obj_folder=%~dp0obj
 set bin_folder=%~dp0
+pushd %CD%
+cd %~dp0
 where cl >NUL 2>&1 1>NUL 
 if not %errorlevel% equ 0 (
     color 04
@@ -21,6 +23,7 @@ if not exist src/getpage.c (
     title file location error
     echo please put %~nx0 at the project root folder
     pause & color & title=%comspec%
+    popd
     goto :EOF
 )
 taskkill /f /im getpage.exe 2>NUL >NUL
@@ -28,12 +31,13 @@ cl /nologo /W2 /Fo%obj_folder%\getpage.obj /Fe%bin_folder%getpage.exe src\getpag
 if %errorlevel% equ 0 (
     rem cls
     color 02
-    title success
     pause & color & title=%comspec%
+    popd
 ) else (
     color 04
     title compile error
     echo bad news & echo.
     pause & color & title=%comspec%
+    popd
 )
 

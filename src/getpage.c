@@ -12,56 +12,63 @@
 
 char proxyConf[128] = {0};
 
-int getString(char* src, char* find, char ret[]){
+int getString(char* src, char* find, char ret[])
+{
     char* prev = strstr(src, find) + strlen(find) + 2;
     char* dblq = strpbrk(prev, "\"<");
     *dblq=0;
     sprintf(ret, "%s", prev);
     return 0;
 }
+
 void extractUrls(
     const char* beg[],
     const int   blength,
     const char* end[],
     const int   elength,
-    int   *start,
+    int* start,
     char  urls[][256],
-    char  tline[]
+    char  nline[]
 )
 {
-    char line[2048]  = { 0 };
+    char line[4096] = { 0 };
     int  i = 0, j = 0, k = *start, len = 0, find = 0;
-    char *next = NULL, *ps = NULL, *pe = NULL;
-    strcpy(line, tline); 
+    char *next = NULL, *ps = NULL, *pe = NULL, *lp = NULL;
+    strcpy(line, nline);
+    lp = line;
     for (i = 0; i < blength; i++) {
         find = 0;
-        ps = strstr(tline, beg[i]);
+        ps = strstr(lp, beg[i]);
         if (ps) {
-            puts(tline);
+            //puts(nline);
             next = ps + strlen(beg[i]);
             //printf("beg[%d]=>>%s<<\nps=%s\nnex=>%s\n", i, beg[i],ps, next);
             for (j = 0; j < elength; j++) {
                 pe = strstr(next, end[j]);
                 if (!find && pe) {
                     len = pe + strlen(end[j]) - next;
-                    strcpy(urls[k],  next);
+                    strcpy(urls[k], next);
                     urls[k][len] = 0;
-                    printf("resouces[%d]=%s\n", k, urls[k]);
-                    ps = strstr(tline, urls[k]);
+                    //printf("urls[%d]=%s\n", k, urls[k]);
+                    ps = strstr(lp, urls[k]);
                     len = strrchr(urls[k], '/') - urls[k];
                     memcpy(ps, "./img", 5);
-                    memcpy(ps+5, ps+len, strlen(ps+len));
-                    *(ps+5+strlen(ps+len)) = 0;
+                    memcpy(ps + 5, ps + len, strlen(ps + len));
+                    *(ps + 5 + strlen(ps + len)) = 0;
                     k++;
+                    //printf("i=%d %s, j=%d %s\n%s\n",i, beg[i], j, end[j],lp + 5 + strlen(urls[k]), beg[i]);
+                    if (strstr(next, beg[i])) {
+                        lp = next;
+                        i--;
+                    }
                     find = 1;
                 }
             }
-            *start += k;
+            *start = k;
         }
     }
-    puts(tline);
+    strcpy(nline, line);
 }
-
 int getTextTutorial(
     const char* url,
     const char* fold,
@@ -76,65 +83,34 @@ int getTextTutorial(
 )
 {
     char curlcmd[256] = { 0 };
-    char line[2048] = { 0 };
-    char tline[2048] = { 0 };
+    char line[4096] = { 0 };
     FILE *fp = NULL;
-    char *ps = NULL, *pe = NULL, *next = NULL;
-    int i = 0, j = 0, k = 0, len = 0;
-    int start = 0, matched = 0, find = 0;
-    
+    int start = 0, matched = 0, k = 0;
+
     sprintf(
-        curlcmd, 
-        "curl %s \"%s\" 2>NUL",
+        curlcmd, "curl %s \"%s\" 2>NUL",
         strlen(proxyConf) ? proxyConf : "", url
     );
     fp = popen(curlcmd, "r");
     if (fp == NULL) {perror("initial request error");return 1;}
     while (fgets(line, sizeof(line), fp) != NULL) {
-        if (start && matched) {
-            break;
-        }
-        if (strstr(line, mst) != NULL) {
-            start = 1;
-        }
+        if (start && matched) {break;}
+        if (strstr(line, mst) != NULL) {start = 1;}
         if (start && !matched) {
-            strcpy(tline, line);
-            for (i = 0; i < blength; i++) {
-                find = 0;
-                ps = strstr(tline, beg[i]);
-                if (ps) {
-                    next = ps + strlen(beg[i]);
-                    for (j = 0; j < elength; j++) {
-                        pe = strstr(next, end[j]);
-                        if (!find && pe) {
-                            len = pe + strlen(end[j]) - next + 1;
-                            strcpy(urls[k],  next);
-                            urls[k][len - 1] = 0;
-                            //printf("resouces[%d]=%s\n", k, urls[k]);
-                            find = 1;
-                            ps = strstr(tline, urls[k]);
-                            len = strrchr(urls[k], '/') - urls[k];
-                            memcpy(ps, "./img", 5);
-                            memcpy(ps+5, ps+len, strlen(ps+len));
-                            *(ps+5+strlen(ps+len)) = 0;
-                            k++;
-                            break;
-                        }
-                    }
-                }
-            }
-            fprintf(hp, "%s", tline);
-            if (strstr(tline, med) != NULL) {
-                matched = 1;
-            }
+            extractUrls(beg, blength, end, elength, &k, urls, line);
+            fprintf(hp, "%s", line);
+            if (strstr(line, med) != NULL) {matched = 1;}
         }
+        memset(line, 0, sizeof(line));
     }
     pclose(fp);
-    // return 0;
+    //return 0;
     //printf("Text=%s\n", text);
     return k;
 }
-void writeHtmlHead(FILE *fp, char *title){
+
+void writeHtmlHead(FILE *fp, char *title)
+{
     fprintf(fp,"%s\n", "<!doctype html>");
     fprintf(fp, "%s\n", "<html lang = 'en-US'>");
     fprintf(fp, "%s\n", "<head>");
@@ -148,12 +124,15 @@ void writeHtmlHead(FILE *fp, char *title){
     fprintf(fp, "%s\n", "<script type='text/javascript' src='../../assets/fixvideo.js'></script>");
     fprintf(fp, "%s\n", "</head><body>");
 }
-void writeHTMLEnd(FILE *fp){
+
+void writeHTMLEnd(FILE *fp)
+{
     fprintf(fp, "%s\n", "</body></html>");
     fclose(fp);
 }
 
-void downloadResources(char* fold, char urls[][256], int urlCount) {
+void downloadResources(char* fold, char urls[][256], int urlCount) 
+{
     char rescmd[256] = { 0 };
     char curlcmd[1024] = { 0 };
     char fullurl[256] = {0};
