@@ -8,9 +8,14 @@ window.onload = function(){
     for(var i=0,il=links.length;i<il;i++){
         var lnk = links[i];
         var href = lnk.getAttribute('href');
-        if(href && href.indexOf('//') == 0){
-            lnk.setAttribute('href', 'https:'+href);
-            lnk.setAttribute('target', '_blank');
+        if(href){
+            if(href.indexOf('//') == 0){
+                lnk.setAttribute('href', 'https:'+href);
+                lnk.setAttribute('target', '_blank');
+            }else if(/^\/\w+\//i.test(href)){
+                lnk.setAttribute('href', 'https://www.pixelmator.com'+href);
+                lnk.setAttribute('target','_blank');
+            }
         }
     }
 };
