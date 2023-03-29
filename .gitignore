@@ -1,4 +1,5 @@
 **/obj
+web/cache
 **/ffmpeg.exe
 **/.vs/
 **/.idea/
