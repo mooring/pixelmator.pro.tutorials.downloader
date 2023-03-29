@@ -12,29 +12,29 @@ int getString(char* src, char* find, char ret[])
 }
 
 void extractResources(
-    const char  *beg[],
-    const int   blength,
-    const char  *end[],
-    const int   elength,
+    const char  *search_begin[],
+    const int   begin_size,
+    const char  *search_end[],
+    const int   end_size,
     int         *start,
     char        urls[][URL_CHRS],
-    char        nline[]
+    char        process_line[]
 )
 {
-    char line[TXT_CHRS]  = {0};
+    char temp_line[TXT_CHRS]  = {0};
     int  i = 0, j = 0, k = *start, len = 0, find = 0;
     char *next = NULL, *ps = NULL, *pe = NULL, *lp = NULL;
-    strcpy(line, nline);
-    lp = line;
-    for (i = 0; i < blength; i++) {
+    strcpy(temp_line, process_line);
+    lp = temp_line;
+    for (i = 0; i < begin_size; i++) {
         find = 0;
-        ps = strstr(lp, beg[i]);
+        ps = strstr(lp, search_begin[i]);
         if (ps) {
-            next = ps + strlen(beg[i]);
-            for (j = 0; j < elength; j++) {
-                pe = strstr(next, end[j]);
+            next = ps + strlen(search_begin[i]);
+            for (j = 0; j < end_size; j++) {
+                pe = strstr(next, search_end[j]);
                 if (!find && pe) {
-                    len = pe + strlen(end[j]) - next;
+                    len = pe + strlen(search_end[j]) - next;
                     strncpy(urls[k], next, URL_CHRS);
                     urls[k][len] = 0;
                     ps = strstr(lp, urls[k]);
@@ -45,7 +45,7 @@ void extractResources(
                     // strip out addition text from source code
                     *(ps + 5 + strlen(ps + len)) = 0;
                     //back loop up for next search token
-                    if (strstr(next, beg[i])) {
+                    if (strstr(next, search_begin[i])) {
                         lp = next;
                         i--;
                     }
@@ -56,17 +56,16 @@ void extractResources(
             *start = k;
         }
     }
-    strcpy(nline, line);
+    strcpy(process_line, temp_line);
 }
 int getTextTutorial(
     const char *url,
-    const char *fold,
-    const char *mst,
-    const char *med,
-    const char *beg[],
-    const int  blength,
-    const char *end[],
-    const int  elength,
+    const char *match_start,
+    const char *match_end,
+    const char *search_begin[],
+    const int  begin_size,
+    const char *search_end[],
+    const int  end_size,
     FILE       *hp,
     char       urls[][URL_CHRS]
 )
@@ -86,11 +85,11 @@ int getTextTutorial(
     }
     while (fgets(line, sizeof(line), fp) != NULL) {
         if (start && matched) {break;}
-        if (strstr(line, mst) != NULL) {start = 1;}
+        if (strstr(line, match_start) != NULL) {start = 1;}
         if (start && !matched) {
-            extractResources(beg, blength, end, elength, &k, urls, line);
+            extractResources(search_begin, begin_size, search_end, end_size, &k, urls, line);
             fprintf(hp, "%s", line);
-            if (strstr(line, med) != NULL) {matched = 1;}
+            if (strstr(line, match_end) != NULL) {matched = 1;}
         }
         memset(line, 0, sizeof(line));
     }
@@ -120,9 +119,9 @@ void writeHTMLEnd(FILE *fp)
     fclose(fp);
 }
 
-void downloadResources(char* fold, char urls[][URL_CHRS], int urlCount) 
+void downloadResources(char* folder, char urls[][URL_CHRS], int urlCount) 
 {
-    char fname[CMD_CHRS]   = {0};
+    char fname[URL_CHRS]   = {0};
     char curlcmd[CMD_CHRS] = {0};
     char fullurl[URL_CHRS] = {0};
     char resurl[URL_CHRS]  = {0};
@@ -141,9 +140,9 @@ void downloadResources(char* fold, char urls[][URL_CHRS], int urlCount)
             curlcmd,
             "@if not exist \"..\\%s\\img\\%s\" "
             "curl %s -o \"..\\%s\\img\\%s\" \"%s\" 2>NUL",
-            fold, fname,
+            folder, fname,
             strlen(proxyConf) ? proxyConf : "",
-            fold, fname, fullurl
+            folder, fname, fullurl
         );
         printf("downloading %s\n", fullurl);
         system(curlcmd);
@@ -154,25 +153,28 @@ void prepareTextTuroial(char *url, char *folder, char *title)
 {
     FILE  *fp         = NULL;
     int   urlCount    = 0;
-    const char* mst   = "<section class=";
-    const char* med   = "</section>";
-    const char* beg[] = { "src=\"", "srcset=\"", "x, "};
-    const char* end[] = { 
+    const char* match_start    = "<section class=";
+    const char* match_end      = "</section>";
+    const char* search_begin[] = { "src=\"", "srcset=\"", "x, "};
+    const char* search_end[]   = { 
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
         ".png ", ".jpg ", ".gif "
     };
-    char pagefile[CMD_CHRS]       = {0};
+    char page_file[CMD_CHRS]       = {0};
     char urls[MAX_IMGS][URL_CHRS] = {0};
     
-    sprintf(pagefile, "..\\%s\\index.html", folder);
+    sprintf(page_file, "..\\%s\\index.html", folder);
     printf("saving tutorial to %s\\index.html\n", folder);
-    fp = fopen(pagefile, "w");
-    if(fp == NULL){perror("writing error: index.html");return;}
+    fp = fopen(page_file, "w");
+    if(fp == NULL){
+        perror("writing error: index.html");
+        return;
+    }
     writeHtmlHead(fp, title);
     urlCount = getTextTutorial(
-        url, folder, mst, med,
-        beg, sizeof(beg)/sizeof(beg[0]), 
-        end, sizeof(end)/sizeof(end[0]),
+        url, match_start, match_end,
+        search_begin, sizeof(search_begin)/sizeof(search_begin[0]),
+        search_end, sizeof(search_end)/sizeof(search_end[0]),
         fp, urls
     );
     writeHTMLEnd(fp);
@@ -343,6 +345,7 @@ int main(int argc, char* argv[])
             printf("preparing %sm/%s\n", find[2], info[2]);
         }
     }
-    fclose(yp);fclose(fp);
+    fclose(yp);
+    fclose(fp);
     return 0;
 }
