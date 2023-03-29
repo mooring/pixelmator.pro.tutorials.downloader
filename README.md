@@ -1,4 +1,4 @@
-# Download Pixcelmator Pro Tutorial to local disk
+# Download Pixcelmator Pro Tutorials to local disk
 
 This project's goal is to download the full tutorials of Pixelmator Pro to local disk for offline usage. The tutorial contains two types of content. One is embeding the youtube player into tutorial page, the left is rich format tutorials including images and videos.
 
