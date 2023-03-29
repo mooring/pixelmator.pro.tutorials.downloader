@@ -13,11 +13,11 @@ Download Pixcelmator Pro Tutorial to local
 ### Already downloaded tutorials (packed as ISO file)
 
 ### Baidu Cloud Share
-- BaiduCloud：[https://pan.baidu.com/s/1i3kkCFNwoMn9SLgCNBEY5w?pwd=m0vk](https://pan.baidu.com/s/1i3kkCFNwoMn9SLgCNBEY5w?pwd=m0vk)
-- Password：m0vk
+- BaiduCloud：[https://pan.baidu.com/s/1gcrtWcgYz8raxY10xjq1CA?pwd=nnth](https://pan.baidu.com/s/1gcrtWcgYz8raxY10xjq1CA?pwd=nnth)
+- Password：nnth
 
 ### Tencent Cloud Share
-- TencentCloud: [https://share.weiyun.com/8e4FUWoC](https://share.weiyun.com/8e4FUWoC)
+- TencentCloud: [https://share.weiyun.com/vZXzu2tX](https://share.weiyun.com/vZXzu2tX)
 
 ### how to use
 mount the iso file , then Open Readme.html with your browser 
