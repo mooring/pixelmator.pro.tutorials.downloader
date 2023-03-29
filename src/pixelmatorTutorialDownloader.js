@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.08
+// @version      0.09
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
 // @match        https://www.pixelmator.com/tutorials/*
@@ -26,7 +26,7 @@ function getCategoryInfo(cmd, collect, init){
     if(init){
         commands.push('cls');
         commands.push('@set getpage=%25~dp0\\..\\getpage.exe');
-        commands.push(`@echo @set down=..\\yt-dlp --write-thumbnail  --embed-metadata  --cache-dir cache --write-link -f "bv[ext=mp4]+ba[ext=m4a]" --progress ${proxy?'--proxy "'+proxy+'"':''} --no-playlist --restrict-filenames --write-subs --audio-quality 10 --merge-output-format "mp4/mkv" --sub-langs "en-US.*,zh-Hans.*" --convert-thumbnails png  --ffmpeg-location ..\\ ${init?'>':'>>'} %25~dp0\\${collect||category}_ytb.cmd`);
+        commands.push(`@echo @set down=..\\yt-dlp --write-thumbnail  --embed-metadata  --cache-dir cache --write-link -f "bv+ba" --progress ${proxy?'--proxy "'+proxy+'"':''} --no-playlist --restrict-filenames --write-subs --audio-quality 10 --merge-output-format "mp4" --sub-langs "en-US.*,zh-Hans.*" --convert-thumbnails png  --ffmpeg-location ..\\ ${init?'>':'>>'} %25~dp0\\${collect||category}_ytb.cmd`);
         html.push(`<!doctype html>`);
         html.push(`<html lang="en-US">`)
         html.push(`<head>`)

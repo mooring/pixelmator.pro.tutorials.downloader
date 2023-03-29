@@ -40,23 +40,23 @@ void extractUrls(
         find = 0;
         ps = strstr(lp, beg[i]);
         if (ps) {
-            //puts(nline);
             next = ps + strlen(beg[i]);
-            //printf("beg[%d]=>>%s<<\nps=%s\nnex=>%s\n", i, beg[i],ps, next);
             for (j = 0; j < elength; j++) {
                 pe = strstr(next, end[j]);
                 if (!find && pe) {
                     len = pe + strlen(end[j]) - next;
-                    strcpy(urls[k], next);
+                    //strcpy(urls[k], next);
+                    strncpy(urls[k], next, 256);
                     urls[k][len] = 0;
-                    //printf("urls[%d]=%s\n", k, urls[k]);
                     ps = strstr(lp, urls[k]);
                     len = strrchr(urls[k], '/') - urls[k];
+                    // strip internet host and path parts from the source code
                     memcpy(ps, "./img", 5);
                     memcpy(ps + 5, ps + len, strlen(ps + len));
+                    // strip out addition text from source code
                     *(ps + 5 + strlen(ps + len)) = 0;
                     k++;
-                    //printf("i=%d %s, j=%d %s\n%s\n",i, beg[i], j, end[j],lp + 5 + strlen(urls[k]), beg[i]);
+                    //back loop up for next search token
                     if (strstr(next, beg[i])) {
                         lp = next;
                         i--;
@@ -104,8 +104,6 @@ int getTextTutorial(
         memset(line, 0, sizeof(line));
     }
     pclose(fp);
-    //return 0;
-    //printf("Text=%s\n", text);
     return k;
 }
 
@@ -148,9 +146,6 @@ void downloadResources(char* fold, char urls[][256], int urlCount)
             url
         );
         memcpy(rescmd, url + len + 1, strlen(url));
-        if(strlen(fullurl)==0){
-            //printf("url=%s\nstrstr(url)=%s\nrescmd=%s\nfull=%s\n", url, strstr(url,"://"), rescmd, fullurl);
-        }
         sprintf(
             curlcmd,
             "curl %s -o \"..\\%s\\img\\%s\" \"%s\" 2>NUL",
@@ -283,9 +278,9 @@ int main(int argc, char* argv[])
     // video tutorial
     if(strlen(info[1])){
         char ytd[] = "..\\..\\yt-dlp --write-thumbnail --embed-metadata"
-            " --cache-dir cache --write-link -f \"bv[ext=mp4]+ba[ext=m4a]\"" 
+            " --cache-dir cache --write-link -f \"bv+ba\"" 
             " --progress --no-playlist --restrict-filenames --write-subs"
-            " --audio-quality 10 --merge-output-format \"mp4/mkv\""
+            " --audio-quality 10 --merge-output-format \"mp4\""
             " --sub-langs \"en-US.*,zh-Hans.*\" --convert-thumbnails png"
             " --ffmpeg-location ..\\..\\";
         sprintf(
