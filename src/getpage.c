@@ -61,6 +61,7 @@ void extractUrls(
     }
     puts(tline);
 }
+
 int getTextTutorial(
     const char* url,
     const char* fold,
@@ -216,8 +217,7 @@ void prepareTextTuroial(char *url, char *fold, char *title)
 int parseTutorialPage(char *url, char find[][100], char info[3][512])
 {
     char cmd[1024]   = {0};
-    char cpcmd[100]  = {0};
-    char html[10240] = {0};
+    char line[10240] = {0};
     char ctx[10240]  = {0};
     int  i = 0,count = 0;
     char *fstr;
@@ -234,12 +234,12 @@ int parseTutorialPage(char *url, char find[][100], char info[3][512])
         perror("init curl error\n");
         return 1;
     }
-    while(fgets(html, sizeof(html), fp) != NULL){
+    while(fgets(line, sizeof(line), fp) != NULL){
         if(count >= 3){break;}
         for(i=0; i<3; i++){
             fstr = find[i];
             memset(ctx, 0, sizeof(ctx));
-            memcpy(ctx, html, sizeof(html));
+            memcpy(ctx, line, sizeof(line));
             if(strstr(ctx, fstr)){
                 getString(ctx, fstr, info[i]);
                 count++;
@@ -250,7 +250,7 @@ int parseTutorialPage(char *url, char find[][100], char info[3][512])
                 count++;
             }
         }
-        memset(html, 0, sizeof(html));
+        memset(line, 0, sizeof(line));
     }
     pclose(fp);
     return 0;
