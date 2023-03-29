@@ -17,7 +17,7 @@ Download Pixcelmator Pro Tutorial to local
 - Password：m0vk
 
 ### Tencent Cloud Share
-- TencentCloud: 
+- TencentCloud: [https://share.weiyun.com/8e4FUWoC](https://share.weiyun.com/8e4FUWoC)
 
 ### how to use
 mount the iso file , then Open Readme.html with your browser 
