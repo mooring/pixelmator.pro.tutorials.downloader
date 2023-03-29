@@ -7,8 +7,10 @@
     #define pclose _pclose
 #endif
 
-#define MAX_LINE 512
 #define MAX_IMGS 50
+#define URL_CHRS 256
+#define MAX_LINE 512
+#define TXT_CHRS 4096
 
 char proxyConf[128] = {0};
 
@@ -27,11 +29,11 @@ void extractUrls(
     const char* end[],
     const int   elength,
     int* start,
-    char  urls[][256],
+    char  urls[][URL_CHRS],
     char  nline[]
 )
 {
-    char line[4096] = { 0 };
+    char line[TXT_CHRS] = {0};
     int  i = 0, j = 0, k = *start, len = 0, find = 0;
     char *next = NULL, *ps = NULL, *pe = NULL, *lp = NULL;
     strcpy(line, nline);
@@ -45,8 +47,7 @@ void extractUrls(
                 pe = strstr(next, end[j]);
                 if (!find && pe) {
                     len = pe + strlen(end[j]) - next;
-                    //strcpy(urls[k], next);
-                    strncpy(urls[k], next, 256);
+                    strncpy(urls[k], next, URL_CHRS);
                     urls[k][len] = 0;
                     ps = strstr(lp, urls[k]);
                     len = strrchr(urls[k], '/') - urls[k];
@@ -79,14 +80,13 @@ int getTextTutorial(
     const char* end[],
     const int   elength,
     FILE  *hp,
-    char  urls[][256]
+    char  urls[][URL_CHRS]
 )
 {
-    char curlcmd[256] = { 0 };
-    char line[4096] = { 0 };
     FILE *fp = NULL;
-    int start = 0, matched = 0, k = 0;
-
+    char curlcmd[URL_CHRS] = {0};
+    char line[TXT_CHRS] = {0};
+    int  start = 0, matched = 0, k = 0;
     sprintf(
         curlcmd, "curl %s \"%s\" 2>NUL",
         strlen(proxyConf) ? proxyConf : "", url
@@ -129,12 +129,12 @@ void writeHTMLEnd(FILE *fp)
     fclose(fp);
 }
 
-void downloadResources(char* fold, char urls[][256], int urlCount) 
+void downloadResources(char* fold, char urls[][URL_CHRS], int urlCount) 
 {
-    char rescmd[256] = { 0 };
-    char curlcmd[1024] = { 0 };
-    char fullurl[256] = {0};
-    char url[256] = {0};
+    char rescmd[256] = {0};
+    char curlcmd[1024] = {0};
+    char fullurl[URL_CHRS] = {0};
+    char url[URL_CHRS] = {0};
     int  i = 0, j = 0, len;
     for (i = 0; i < urlCount; i++) {
         strcpy(url, urls[i]);
@@ -168,8 +168,8 @@ void prepareTextTuroial(char *url, char *fold, char *title)
     };
     FILE *fp          = NULL;
     int  urlCount     = 0;
-    char rescmd[128]  = { 0 };
-    char urls[MAX_IMGS][256] = { 0 };
+    char rescmd[128]  = {0};
+    char urls[MAX_IMGS][URL_CHRS] = {0};
     
     sprintf(rescmd, "..\\%s\\index.html", fold);
     printf("saving %s\\index.html\n", fold);
@@ -239,7 +239,7 @@ int main(int argc, char* argv[])
         "https://upload-cdn.pixelmator.co"
     };
     char info[3][512]   = {0};
-    char url[256]       = {0};
+    char url[URL_CHRS]       = {0};
     char proxy[128]     = {0};
     char rescmd[128]    = {0};
     char ytbcmd[128]    = {0};
