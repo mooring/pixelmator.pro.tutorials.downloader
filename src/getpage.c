@@ -11,7 +11,7 @@ int getString(char* src, char* find, char ret[])
     return 0;
 }
 
-void extractUrls(
+void extractResources(
     const char  *beg[],
     const int   blength,
     const char  *end[],
@@ -80,12 +80,15 @@ int getTextTutorial(
         strlen(proxyConf) ? proxyConf : "", url
     );
     fp = popen(curlcmd, "r");
-    if (fp == NULL) {perror("initial request error");return OPEN_ERR;}
+    if (fp == NULL) {
+        perror("initial request error");
+        return OPEN_ERR;
+    }
     while (fgets(line, sizeof(line), fp) != NULL) {
         if (start && matched) {break;}
         if (strstr(line, mst) != NULL) {start = 1;}
         if (start && !matched) {
-            extractUrls(beg, blength, end, elength, &k, urls, line);
+            extractResources(beg, blength, end, elength, &k, urls, line);
             fprintf(hp, "%s", line);
             if (strstr(line, med) != NULL) {matched = 1;}
         }
@@ -195,7 +198,10 @@ int parseTutorialPage(char *url, char find[][FND_CHRS], char info[][FUD_CHRS])
         url
     );
     fp = popen(cmd, "r");
-    if(fp == NULL){perror("init curl error\n");return OPEN_ERR;}
+    if(fp == NULL){
+        perror("init curl error\n");
+        return OPEN_ERR;
+    }
     while(fgets(line, sizeof(line), fp) != NULL){
         if(count >= FND_GRPS){break;}
         for(i=0; i<FND_GRPS; i++){
@@ -252,9 +258,15 @@ int main(int argc, char* argv[])
     printf("\nParsing Tutorial...\nTarget: %s\nOutput: %s\n", url, output);
     
     fp = fopen(rescmd, "a+");
-    if(fp == NULL){perror("open resource download error");return OPEN_ERR;}
+    if(fp == NULL){
+        perror("open resource download error");
+        return OPEN_ERR;
+    }
     yp = fopen(ytbcmd, "a+");
-    if(yp == NULL){perror("open youtube download error");return OPEN_ERR;}
+    if(yp == NULL){
+        perror("open youtube download error");
+        return OPEN_ERR;
+    }
     pp = fopen("..\\assets\\proxy.conf","r");
     if(pp != NULL){
         fscanf(pp, "%s", proxy);
