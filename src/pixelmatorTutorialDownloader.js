@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.12
+// @version      0.13
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
 // @match        https://www.pixelmator.com/tutorials/*
@@ -115,7 +115,7 @@ function collect(cmd){
     let lproxy = localStorage.getItem('pixelmatorTutorialDownloader_proxy');
     if(cmd=='cmd'){
         proxy = prompt("Input proxy string like http://127.0.0.1:8899, if no proxy keep it empty", lproxy || '');
-        localStorage.setItem('archiveAssistant_proxy', proxy||'');
+        localStorage.setItem('pixelmatorTutorialDownloader_proxy', proxy||'');
     }
     for(let i=0,il=categories.length;i<il;i++){
         categories[i].click();
