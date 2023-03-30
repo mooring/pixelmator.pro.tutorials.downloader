@@ -36,8 +36,8 @@ or you can download the packed version list bellow:
 ### Tencent Cloud Share
 - TencentCloud: [https://share.weiyun.com/vZXzu2tX](https://share.weiyun.com/vZXzu2tX)
 
-### how to use
-mount the iso file , then Open Readme.html with your browser 
+### Using the iso file
+mount and open Start.html with your browser 
 
 
 ### About the source code
