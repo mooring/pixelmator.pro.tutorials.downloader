@@ -16,13 +16,13 @@ void extractResources(
     const int   begin_size,
     const char  *search_end[],
     const int   end_size,
-    int         *start,
+    int         *urlCount,
     char        urls[][URL_CHRS],
-    char        process_line[]
+    char        process_line[TXT_CHRS]
 )
 {
     char temp_line[TXT_CHRS]  = {0};
-    int  i = 0, j = 0, k = *start, len = 0, find = 0;
+    int  i = 0, j = 0, k = *urlCount, len = 0, find = 0;
     char *next = NULL, *ps = NULL, *pe = NULL, *lp = NULL;
     strcpy(temp_line, process_line);
     lp = temp_line;
@@ -53,7 +53,7 @@ void extractResources(
                     k++;
                 }
             }
-            *start = k;
+            *urlCount = k;
         }
     }
     strcpy(process_line, temp_line);
@@ -226,7 +226,8 @@ int parseTutorialPage(char *url, char find[][FND_CHRS], char info[][FUD_CHRS])
     return 0;
 }
 
-// getpage "https://www.pixelmator.com/tutorials/how-to-create-a-neon-sign-effect/" "Design\how-to-create-a-neon-sign-effect" "Resources"
+// getpage "https://www.pixelmator.com/tutorials/how-to-create-a-neon-sign-effect/"
+// "Design\how-to-create-a-neon-sign-effect" "Resources"
 int main(int argc, char* argv[])
 {
     char info[FND_GRPS][FUD_CHRS] = {0};
@@ -247,7 +248,7 @@ int main(int argc, char* argv[])
     char *ps = NULL;
     FILE *fp = NULL, *yp = NULL, *pp = NULL;
     if(argc < 3){
-        printf("usage: %s <url> <output_folder> <category>\n", argv[0]);
+        printf("usage: %s <url> <output_folder> <resouce_cmd_file>\n", argv[0]);
         exit(0);
     }
     strcpy(rescmd, "../youtube.cmd");
