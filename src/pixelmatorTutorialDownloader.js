@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.13
+// @version      0.15
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
 // @match        https://www.pixelmator.com/tutorials/*
+// @match        https://www.pixelmator.com/support/guide/pixelmator-pro/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=pixelmator.com
 // @run-at       document-end
 // @grant        GM_registerMenuCommand
@@ -77,15 +78,16 @@ function getCategoryInfo(cmd, collect, init){
         html.push(`</div>`);
         html.push(`<div class="title" onclick="window.open('${lnk}','_blank')">${tit}</div>`);
         html.push(`</div>`);
-        let img1 = `${pth}\\img\\${src.slice(-1)[0]}`, 
+        let img1 = `${pth}\\img\\${src.slice(-1)[0]}`,
             url1 = `${encodeURI(src.join('/')).replace(/%/g,'%%')}`;
         commands.push(`@rem downloading ${encodeURI(src.join('/'))}`);
         commands.push(`@if not exist "${img1}" @curl -o "${img1}" "${url1}" 2>NUL`);
-        let img2 = `${pth}\\img\\${x2.slice(-1)[0].split(' ')[0]}`, 
+        let img2 = `${pth}\\img\\${x2.slice(-1)[0].split(' ')[0]}`,
             url2 = `${encodeURI(x2.join('/').split(' ')[0]).replace(/%/g,'%%')}`;
         commands.push(`@rem downloading ${encodeURI(x2.join('/').split(' ')[0])}`);
         commands.push(`@if not exist "${img2}" @curl -o "${img2}" "${url2}" 2>NUL`);
         commands.push(`@%25getpage%25 "${lnk}" "${category}\\${pth}" "${collect||category}"`);
+        commands.push(`@cd %25~dp0`);
     });
     if(items.length>0){
         html.push(`</div>`);
@@ -97,6 +99,33 @@ function getCategoryInfo(cmd, collect, init){
         let content = cmd == 'cmd' ? commands.join("\n") : html.join("\n");
         down(cmd, category, content)
     }
+}
+
+function getGuideCmd(){
+    let guides = document.querySelectorAll('.guides-menu a');
+    let cmds = [];
+    cmds.push('cls');
+    cmds.push('@set getpage=%25~dp0\\..\\getpage.exe');
+    cmds.push(`@if not exist %25~dp0guide mkdir %25~dp0guide`);
+    let lproxy = localStorage.getItem('pixelmatorTutorialDownloader_proxy');
+    proxy = prompt("Input proxy string like http://127.0.0.1:8899, if no proxy keep it empty", lproxy || '');
+    localStorage.setItem('pixelmatorTutorialDownloader_proxy', proxy||'');
+    cmds.push(`@echo ${proxy||'.'} > "%25~dp0\\assets\\proxy.conf"`);
+    for(let i=0,il=guides.length; i<il; i++){
+        let guide = guides[i];
+        let match = guide.getAttribute('href').match(/\/pixelmator-pro\/(\d+)/)
+        if(!guide.parentElement.classList.contains('openable') && match){
+            cmds.push(`@if not exist "%25~dp0guide\\${match[1]}" mkdir "%25~dp0guide\\${match[1]}\\img"`);
+            cmds.push(`@cd %25~dp0guide`);
+            cmds.push([
+                '@%25getpage%25',
+                `"${guide.href}"`,
+                `"guide\\${match[1]}"`,
+                `"${guide.innerText.replace(/\"/g,'')}"`
+            ].join(' '));
+        }
+    }
+    down('cmd', 'Guides', cmds.join("\n"))
 }
 function down(cmd, category, content){
     let ele = document.createElement('a');
@@ -145,5 +174,8 @@ function collect(cmd){
     });
     GM_registerMenuCommand("get Category HTML", function(evt, keybord){
         getCategoryInfo('html', false, true);
+    });
+    GM_registerMenuCommand("get User Guides", function(evt, keybord){
+        getGuideCmd();
     });
 })();

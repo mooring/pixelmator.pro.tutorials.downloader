@@ -17,6 +17,7 @@ web/cache
 **/Popular/
 **/Text/
 **/Video/
+**/guide/
 */*/*.md
 **/*_res.cmd
 **/*_ytb.cmd

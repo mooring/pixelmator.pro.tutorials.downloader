@@ -39,11 +39,18 @@ void extractResources(
                     urls[k][len] = 0;
                     ps = strstr(lp, urls[k]);
                     len = strrchr(urls[k], '/') - urls[k];
-                    // strip internet host and path parts from the source code
-                    memcpy(ps, "./img", 5);
-                    memcpy(ps + 5, ps + len, strlen(ps + len));
-                    // strip out addition text from source code
-                    *(ps + 5 + strlen(ps + len)) = 0;
+                    // printf("urls[%d] %d=%s\n", k, len, urls[k]);
+                    // strip out relative urls
+                    if(strstr(urls[k],"http")){
+                        // strip internet host and path parts from the source code
+                        memcpy(ps, "./img", 5);
+                        memcpy(ps + 5, ps + len, strlen(ps + len));
+                        // strip out addition text from source code
+                        *(ps + 5 + strlen(ps + len)) = 0;
+                    }else{
+                        memset(urls[k], 0, URL_CHRS);
+                        k--;
+                    }
                     //back loop up for next search token
                     if (strstr(next, search_begin[i])) {
                         lp = next;
@@ -58,10 +65,11 @@ void extractResources(
     }
     strcpy(process_line, temp_line);
 }
-int getTextTutorial(
+int getTextWebpage(
     const char *url,
     const char *match_start,
     const char *match_end,
+    const int  include_end,
     const char *search_begin[],
     const int  begin_size,
     const char *search_end[],
@@ -88,8 +96,12 @@ int getTextTutorial(
         if (strstr(line, match_start) != NULL) {start = 1;}
         if (start && !matched) {
             extractResources(search_begin, begin_size, search_end, end_size, &k, urls, line);
-            fprintf(hp, "%s", line);
-            if (strstr(line, match_end) != NULL) {matched = 1;}
+            if (strstr(line, match_end) != NULL) {
+                matched = 1;
+            }
+            if((matched && include_end) || !matched){
+                fprintf(hp, "%s", line);
+            }
         }
         memset(line, 0, sizeof(line));
     }
@@ -97,7 +109,7 @@ int getTextTutorial(
     return k;
 }
 
-void writeHtmlHead(FILE *fp, char *title)
+void writeHtmlHead(FILE *fp, char *title, char *style, char *extra)
 {
     fprintf(fp,"%s\n", "<!doctype html>");
     fprintf(fp, "%s\n", "<html lang = 'en-US'>");
@@ -107,8 +119,9 @@ void writeHtmlHead(FILE *fp, char *title)
     fprintf(fp, "%s\n", "<meta name='author' content = 'mooring@codernote.club' />");
     fprintf(fp, "%s\n", "<meta name='description' content = 'Pixelmator Pro Tutorial' />");
     fprintf(fp, "%s\n", "<meta name='viewport' content = 'width=device-width,initial-scale=1' />");
-    fprintf(fp, "%s\n", "<link rel='stylesheet' type='text/css' href='../../assets/styles.css' />");
+    fprintf(fp, "%s%s' />\n", "<link rel='stylesheet' type='text/css' href='../../assets/",style);
     fprintf(fp, "%s\n", "<script type='text/javascript' src='../../assets/jquery.min.js'></script>");
+    fprintf(fp, "%s\n", extra);
     fprintf(fp, "%s\n", "<script type='text/javascript' src='../../assets/fixvideo.js'></script>");
     fprintf(fp, "%s\n", "</head><body>");
 }
@@ -155,10 +168,14 @@ void prepareTextTuroial(char *url, char *folder, char *title)
     int   urlCount    = 0;
     const char* match_start    = "<section class=";
     const char* match_end      = "</section>";
-    const char* search_begin[] = { "src=\"", "srcset=\"", "x, "};
+    const char* search_begin[] = {
+        "src=\"", "srcset=\"", "href=\"", 
+        "src='", "srcset='", "href='",
+        "x, ", "1x, ", "2x, "
+    };
     const char* search_end[]   = { 
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
-        ".png ", ".jpg ", ".gif "
+        ".png ", ".jpg ", ".gif ", ".jpeg", ".jpeg "
     };
     char page_file[CMD_CHRS]       = {0};
     char urls[MAX_IMGS][URL_CHRS] = {0};
@@ -170,9 +187,9 @@ void prepareTextTuroial(char *url, char *folder, char *title)
         perror("writing error: index.html");
         return;
     }
-    writeHtmlHead(fp, title);
-    urlCount = getTextTutorial(
-        url, match_start, match_end,
+    writeHtmlHead(fp, title, "styles.css","");
+    urlCount = getTextWebpage(
+        url, match_start, match_end, 1,
         search_begin, sizeof(search_begin)/sizeof(search_begin[0]),
         search_end, sizeof(search_end)/sizeof(search_end[0]),
         fp, urls
@@ -226,6 +243,69 @@ int parseTutorialPage(char *url, char find[][FND_CHRS], char info[][FUD_CHRS])
     return 0;
 }
 
+void prepareTextGuide(char *url, char *id, char *folder, char *title)
+{
+    FILE  *fp         = NULL;
+    int   urlCount    = 0;
+    const char* match_start    = "<div class=\"current-page l-wrapper\"";
+    const char* match_end      = "<footer ";
+    const char* search_begin[] = { 
+        "src=\"", "srcset=\"", "href=\"", 
+        "src='", "srcset='", "href='",
+        "x, ", "1x, ", "2x ,"
+    };
+    const char* search_end[]   = { 
+        ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
+        ".png ", ".jpg ", ".gif ", ".jpeg", ".jpeg "
+    };
+    char mkdir_cmd[CMD_CHRS]       = {0};
+    char curl_cmd[CMD_CHRS]        = {0};
+    char page_file[CMD_CHRS]       = {0};
+    char urls[MAX_IMGS][URL_CHRS]  = {0};
+    sprintf(mkdir_cmd, 
+        "@if not exist \"..\\%s\\%s\\\" ("
+        "mkdir \"..\\%s\\%s\\\""
+        "& mkdir \"..\\%s\\%s\\img\")",
+        folder, id, folder, id, folder, id
+    );
+    sprintf(curl_cmd,
+        "curl %s -o \"..\\%s\\%s\\index.html\" \"%s\" 2>NUL 1>NUL",
+        proxyConf, folder, id, url
+    );
+    //puts(mkdir_cmd);
+    system(mkdir_cmd);
+    //puts(curl_cmd);
+    system(curl_cmd);
+    sprintf(page_file, "..\\%s\\%s\\index.html", folder, id);
+    printf("saving guide to %s\\%s\\index.html\n", folder, id);
+    fp = fopen(page_file, "w");
+    if(fp == NULL){
+        perror("writing guide error");
+        return;
+    }
+    sprintf(mkdir_cmd, "<script type='text/javascript' src='../../assets/guide-module.js'></script>");
+    writeHtmlHead(fp, title, "guide.css", mkdir_cmd);
+    urlCount = getTextWebpage(
+        url, match_start, match_end, 0,
+        search_begin, sizeof(search_begin)/sizeof(search_begin[0]),
+        search_end, sizeof(search_end)/sizeof(search_end[0]),
+        fp, urls
+    );
+    writeHTMLEnd(fp);
+    if(urlCount){
+        sprintf(mkdir_cmd, "%s\\%s", folder, id);
+        downloadResources(mkdir_cmd, urls, urlCount);
+    }
+}
+
+void getGuide(char *title, char *id){
+    char url[URL_CHRS] = {0};
+    char *pre = "https://www.pixelmator.com/support/guide/pixelmator-pro/";
+    sprintf(url, "%s%s/", pre, id);
+    printf("geting guide: %s\nGuide url: %s\n", title, url);
+    prepareTextGuide(url, id, "guide", title);
+}
+
 // getpage "https://www.pixelmator.com/tutorials/how-to-create-a-neon-sign-effect/"
 // "Design\how-to-create-a-neon-sign-effect" "Resources"
 int main(int argc, char* argv[])
@@ -236,7 +316,7 @@ int main(int argc, char* argv[])
         "https://youtu.b",
         "https://upload-cdn.pixelmator.co"
     };
-    
+    char guideid[16]         = {0};
     char url[URL_CHRS]       = {0};
     char proxy[PXY_CHRS]     = {0};
     char rescmd[CMD_CHRS]    = {0};
@@ -251,6 +331,13 @@ int main(int argc, char* argv[])
         printf("usage: %s <url> <output_folder> <resouce_cmd_file>\n", argv[0]);
         exit(0);
     }
+    // download guide page only
+    if(strstr(argv[2], "guide")){
+        strcpy(guideid, strstr(argv[2], "\\") + 1);
+        // printf("getGuide(\"%s\",\"%s\");\n", argv[3], guideid);
+        getGuide(argv[3], guideid);
+        return 0;
+    }
     strcpy(rescmd, "../youtube.cmd");
     strcpy(url, argv[1]);
     strcpy(output, argv[2]);
@@ -258,8 +345,6 @@ int main(int argc, char* argv[])
         sprintf(rescmd, "..\\%s_res.cmd", argv[3]);
         sprintf(ytbcmd, "..\\%s_ytb.cmd", argv[3]);
     }
-    printf("\nParsing Tutorial...\nTarget: %s\nOutput: %s\n", url, output);
-    
     fp = fopen(rescmd, "a+");
     if(fp == NULL){
         perror("open resource download error");
@@ -278,6 +363,7 @@ int main(int argc, char* argv[])
         fclose(pp);
     }
     
+    printf("\nParsing Tutorial...\nTarget: %s\nOutput: %s\n", url, output);
     parseTutorialPage(url, find, info);
     printf("Title: %s\nYoutube: %s\nResource: %s\n", info[0], info[1], info[2]);
     
