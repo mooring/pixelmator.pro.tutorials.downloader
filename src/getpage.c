@@ -41,7 +41,7 @@ void extractResources(
                     len = strrchr(urls[k], '/') - urls[k];
                     // printf("urls[%d] %d=%s\n", k, len, urls[k]);
                     // strip out relative urls
-                    if(strstr(urls[k],"http")){
+                    if(strstr(urls[k],"http") || strstr(urls[k],"//")){
                         // strip internet host and path parts from the source code
                         memcpy(ps, "./img", 5);
                         memcpy(ps + 5, ps + len, strlen(ps + len));
@@ -122,12 +122,12 @@ void writeHtmlHead(FILE *fp, char *title, char *style, char *extra)
     fprintf(fp, "%s%s' />\n", "<link rel='stylesheet' type='text/css' href='../../assets/",style);
     fprintf(fp, "%s\n", "<script type='text/javascript' src='../../assets/jquery.min.js'></script>");
     fprintf(fp, "%s\n", extra);
-    fprintf(fp, "%s\n", "<script type='text/javascript' src='../../assets/fixvideo.js'></script>");
     fprintf(fp, "%s\n", "</head><body>");
 }
 
 void writeHTMLEnd(FILE *fp)
 {
+    fprintf(fp, "%s\n", "<script type='text/javascript' src='../../assets/fixvideo.js'></script>");
     fprintf(fp, "%s\n", "</body></html>");
     fclose(fp);
 }
@@ -304,7 +304,7 @@ void getGuide(char *title, char *id){
     char url[URL_CHRS] = {0};
     char *pre = "https://www.pixelmator.com/support/guide/pixelmator-pro/";
     sprintf(url, "%s%s/", pre, id);
-    printf("geting guide: %s\nGuide url: %s\n", title, url);
+    printf("\nParsing Guide: ...\nTarget: %s\nTitle: \nProxy: %s", url, title, proxyConf);
     prepareTextGuide(url, id, "guide", title);
 }
 
