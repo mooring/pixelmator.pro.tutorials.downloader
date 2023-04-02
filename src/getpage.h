@@ -10,7 +10,7 @@
     #define pclose _pclose
 #endif
 
-#define MAX_IMGS 50
+#define MAX_IMGS 75
 #define FND_GRPS 3
 #define FND_CHRS 128
 #define FUD_CHRS 256

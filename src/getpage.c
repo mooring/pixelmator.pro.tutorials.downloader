@@ -23,7 +23,7 @@ void extractResources(
 {
     char temp_line[TXT_CHRS]  = {0};
     int  i = 0, j = 0, k = *urlCount, len = 0, find = 0;
-    char *next = NULL, *ps = NULL, *pe = NULL, *lp = NULL;
+    char *next = NULL, *ps = NULL, *pe = NULL, *pee = NULL, *lp = NULL;
     strcpy(temp_line, process_line);
     lp = temp_line;
     for (i = 0; i < begin_size; i++) {
@@ -31,9 +31,10 @@ void extractResources(
         ps = strstr(lp, search_begin[i]);
         if (ps) {
             next = ps + strlen(search_begin[i]);
+            pee = strpbrk(next, "\'\""); 
             for (j = 0; j < end_size; j++) {
                 pe = strstr(next, search_end[j]);
-                if (!find && pe) {
+                if (!find && pe && pe < pee) {
                     len = pe + strlen(search_end[j]) - next;
                     strncpy(urls[k], next, URL_CHRS);
                     urls[k][len] = 0;
@@ -152,10 +153,11 @@ void downloadResources(char* folder, char urls[][URL_CHRS], int urlCount)
         sprintf(
             curlcmd,
             "@if not exist \"..\\%s\\img\\%s\" "
-            "curl %s -o \"..\\%s\\img\\%s\" \"%s\" 2>NUL",
+            "curl %s -o \"..\\%s\\img\\%s\" \"%s\" %s",
             folder, fname,
             strlen(proxyConf) ? proxyConf : "",
-            folder, fname, fullurl
+            folder, fname, fullurl,
+            strstr(resurl,".mp4")||strstr(resurl,".zip") ? "" : "2>NUL"
         );
         printf("downloading %s\n", fullurl);
         system(curlcmd);
@@ -304,7 +306,7 @@ void getGuide(char *title, char *id){
     char url[URL_CHRS] = {0};
     char *pre = "https://www.pixelmator.com/support/guide/pixelmator-pro/";
     sprintf(url, "%s%s/", pre, id);
-    printf("\nParsing Guide: ...\nTarget: %s\nTitle: \nProxy: %s", url, title, proxyConf);
+    printf("\nParsing Guide: ...\nProxy: %s\nTarget: %s\nTitle: %s\n", proxyConf, url, title);
     prepareTextGuide(url, id, "guide", title);
 }
 
@@ -333,6 +335,13 @@ int main(int argc, char* argv[])
         printf("usage: %s <url> <output_folder> <resouce_cmd_file>\n", argv[0]);
         exit(0);
     }
+    pp = fopen("..\\assets\\proxy.conf","r");
+    if(pp != NULL){
+        fscanf(pp, "%s", proxy);
+        sprintf(proxyConf, "--proxy \"%s\"", proxy);
+        // printf("Proxy: %s\n", proxyConf);
+        fclose(pp);
+    }
     // download guide page only
     if(strstr(argv[2], "guide")){
         strcpy(guideid, strstr(argv[2], "\\") + 1);
@@ -357,15 +366,9 @@ int main(int argc, char* argv[])
         perror("open youtube download error");
         return OPEN_ERR;
     }
-    pp = fopen("..\\assets\\proxy.conf","r");
-    if(pp != NULL){
-        fscanf(pp, "%s", proxy);
-        sprintf(proxyConf, "--proxy \"%s\"", proxy);
-        printf("Proxy: %s\n", proxyConf);
-        fclose(pp);
-    }
     
-    printf("\nParsing Tutorial...\nTarget: %s\nOutput: %s\n", url, output);
+    
+    printf("\nParsing Tutorial...\nProxy: %s\Target: %s\nOutput: %s\n", proxyConf, url, output);
     parseTutorialPage(url, find, info);
     printf("Title: %s\nYoutube: %s\nResource: %s\n", info[0], info[1], info[2]);
     
