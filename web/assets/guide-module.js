@@ -56,7 +56,9 @@
       var $word = $(this).text();
       var $explanation = $(this).attr('data-explanation');
       var $glossary;
-
+      var reg = /href=([\"\'])\/support\/guide\/pixelmator-pro\/(\d+)[^\"\']*\1/ig;
+      $explanation = $explanation.replace(reg, `href="../$2/index.html"`);
+      // debugger;
       $glossary = $(
         '<aside class="glossary-overlay">' + 
           '<div class="glossary-modal">' + 

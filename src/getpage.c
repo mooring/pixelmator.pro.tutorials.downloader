@@ -171,7 +171,8 @@ void prepareTextTuroial(char *url, char *folder, char *title)
     const char* search_begin[] = {
         "src=\"", "srcset=\"", "href=\"", 
         "src='", "srcset='", "href='",
-        "x, ", "1x, ", "2x, "
+        "x, ", "1x, ", "2x, ",
+        "poster=\""
     };
     const char* search_end[]   = { 
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
@@ -252,7 +253,8 @@ void prepareTextGuide(char *url, char *id, char *folder, char *title)
     const char* search_begin[] = { 
         "src=\"", "srcset=\"", "href=\"", 
         "src='", "srcset='", "href='",
-        "x, ", "1x, ", "2x ,"
+        "x, ", "1x, ", "2x ,",
+        "poster=\""
     };
     const char* search_end[]   = { 
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
