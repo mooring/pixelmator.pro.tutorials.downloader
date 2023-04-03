@@ -31,7 +31,7 @@ void extractResources(
         ps = strstr(lp, search_begin[i]);
         if (ps) {
             next = ps + strlen(search_begin[i]);
-            pee = strpbrk(next, "\'\""); 
+            pee = strpbrk(next, "\'\")"); 
             for (j = 0; j < end_size; j++) {
                 pe = strstr(next, search_end[j]);
                 if (!find && pe && pe < pee) {
@@ -174,8 +174,7 @@ void prepareTextTuroial(char *url, char *folder, char *title)
         "src=\"", "srcset=\"", "href=\"", 
         "src='", "srcset='", "href='",
         "x, ", "1x, ", "2x, ",
-        "poster=\"",
-        "url(\""
+        "poster=\"", "url(", "url(\""
     };
     const char* search_end[]   = { 
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
@@ -250,8 +249,7 @@ void prepareTextGuide(char *url, char *id, char *folder, char *title)
         "src=\"", "srcset=\"", "href=\"", 
         "src='", "srcset='", "href='",
         "x, ", "1x, ", "2x ,",
-        "poster=\"",
-        "url(\""
+        "poster=\"", "url(", "url(\"" 
     };
     const char* search_end[]   = { 
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
