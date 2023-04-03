@@ -13,6 +13,7 @@
 #define MAX_IMGS 75
 #define FND_GRPS 3
 #define FND_CHRS 128
+#define RES_CMDS 128
 #define FUD_CHRS 256
 #define PXY_CHRS 128
 #define URL_CHRS 256

@@ -174,7 +174,8 @@ void prepareTextTuroial(char *url, char *folder, char *title)
         "src=\"", "srcset=\"", "href=\"", 
         "src='", "srcset='", "href='",
         "x, ", "1x, ", "2x, ",
-        "poster=\""
+        "poster=\"",
+        "url(\""
     };
     const char* search_end[]   = { 
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
@@ -205,25 +206,18 @@ void prepareTextTuroial(char *url, char *folder, char *title)
 // parse the pixelmator.com tutorial page
 int parseTutorialPage(char *url, char find[][FND_CHRS], char info[][FUD_CHRS])
 {
-    int  i     = 0;
-    int  count = 0;
-    char *fstr = NULL;
-    FILE *fp   = NULL;
+    int  i              = 0;
+    int  count          = 0;
+    char *fstr          = NULL;
+    FILE *fp            = NULL;
     char cmd[CMD_CHRS]  = {0};
     char line[TXT_CHRS] = {0};
     char ctx[TXT_CHRS]  = {0};
     char *titlefix      = "t-hero-title";
-    sprintf(
-        cmd,
-        "curl %s \"%s\" 2>NUL",
-        strlen(proxyConf) ? proxyConf : "",
-        url
-    );
+    
+    sprintf(cmd,"curl %s \"%s\" 2>NUL",strlen(proxyConf) ? proxyConf : "",url);
     fp = popen(cmd, "r");
-    if(fp == NULL){
-        perror("init curl error\n");
-        return OPEN_ERR;
-    }
+    if(fp == NULL){perror("init curl error\n");return OPEN_ERR;}
     while(fgets(line, sizeof(line), fp) != NULL){
         if(count >= FND_GRPS){break;}
         for(i=0; i<FND_GRPS; i++){
@@ -256,7 +250,8 @@ void prepareTextGuide(char *url, char *id, char *folder, char *title)
         "src=\"", "srcset=\"", "href=\"", 
         "src='", "srcset='", "href='",
         "x, ", "1x, ", "2x ,",
-        "poster=\""
+        "poster=\"",
+        "url(\""
     };
     const char* search_end[]   = { 
         ".png", ".jpg", ".gif", ".mov", ".mp4", ".zip",
@@ -302,7 +297,8 @@ void prepareTextGuide(char *url, char *id, char *folder, char *title)
     }
 }
 
-void getGuide(char *title, char *id){
+void getGuide(char *title, char *id)
+{
     char url[URL_CHRS] = {0};
     char *pre = "https://www.pixelmator.com/support/guide/pixelmator-pro/";
     sprintf(url, "%s%s/", pre, id);
@@ -310,9 +306,8 @@ void getGuide(char *title, char *id){
     prepareTextGuide(url, id, "guide", title);
 }
 
-// getpage "https://www.pixelmator.com/tutorials/how-to-create-a-neon-sign-effect/"
-// "Design\how-to-create-a-neon-sign-effect" "Resources"
-int main(int argc, char* argv[])
+
+int getTutorial(char *url, char *outfolder, char *cmd, int downall)
 {
     char info[FND_GRPS][FUD_CHRS] = {0};
     char find[FND_GRPS][FND_CHRS] = {
@@ -320,58 +315,22 @@ int main(int argc, char* argv[])
         "https://youtu.b",
         "https://upload-cdn.pixelmator.co"
     };
-    char guideid[16]         = {0};
-    char url[URL_CHRS]       = {0};
-    char proxy[PXY_CHRS]     = {0};
-    char rescmd[CMD_CHRS]    = {0};
-    char ytbcmd[CMD_CHRS]    = {0};
-    char youtube[CMD_CHRS]   = {0};
-    char resource[CMD_CHRS]  = {0};
-    char output[CMD_CHRS]    = {"web"};
+    char rescmd[RES_CMDS]    = {0};
+    char ytbcmd[RES_CMDS]    = {0};
+    char curlcmd[CMD_CHRS]   = {0};
     int  i   = 0;
     char *ps = NULL;
-    FILE *fp = NULL, *yp = NULL, *pp = NULL;
-    if(argc < 3){
-        printf("usage: %s <url> <output_folder> <resouce_cmd_file>\n", argv[0]);
-        exit(0);
-    }
-    pp = fopen("..\\assets\\proxy.conf","r");
-    if(pp != NULL){
-        fscanf(pp, "%s", proxy);
-        sprintf(proxyConf, "--proxy \"%s\"", proxy);
-        // printf("Proxy: %s\n", proxyConf);
-        fclose(pp);
-    }
-    // download guide page only
-    if(strstr(argv[2], "guide")){
-        strcpy(guideid, strstr(argv[2], "\\") + 1);
-        // printf("getGuide(\"%s\",\"%s\");\n", argv[3], guideid);
-        getGuide(argv[3], guideid);
-        return 0;
-    }
-    strcpy(rescmd, "../youtube.cmd");
-    strcpy(url, argv[1]);
-    strcpy(output, argv[2]);
-    if(argc >= 4 && strlen(argv[3])){
-        sprintf(rescmd, "..\\%s_res.cmd", argv[3]);
-        sprintf(ytbcmd, "..\\%s_ytb.cmd", argv[3]);
-    }
+    FILE *fp = NULL, *yp = NULL;
+    sprintf(rescmd, "..\\%s_res.cmd", cmd);
+    sprintf(ytbcmd, "..\\%s_ytb.cmd", cmd);
     fp = fopen(rescmd, "a+");
-    if(fp == NULL){
-        perror("open resource download error");
-        return OPEN_ERR;
-    }
+    if(fp == NULL){perror("open resource download error");return OPEN_ERR;}
     yp = fopen(ytbcmd, "a+");
-    if(yp == NULL){
-        perror("open youtube download error");
-        return OPEN_ERR;
-    }
+    if(yp == NULL){perror("open youtube download error");return OPEN_ERR;}
     
-    
-    printf("\nParsing Tutorial...\nProxy: %s\Target: %s\nOutput: %s\n", proxyConf, url, output);
+    printf("\nParsing Tutorial...\nProxy: %s\nTarget: %s\nOutput: %s\n", proxyConf, url, outfolder);
     parseTutorialPage(url, find, info);
     printf("Title: %s\nYoutube: %s\nResource: %s\n", info[0], info[1], info[2]);
-    
     // video tutorial
     if(strlen(info[1])){
         char ytd[] = "..\\..\\yt-dlp --write-thumbnail --embed-metadata"
@@ -381,40 +340,40 @@ int main(int argc, char* argv[])
             " --sub-langs \"en-US.*,zh-Hans.*\" --convert-thumbnails png"
             " --ffmpeg-location ..\\..\\";
         sprintf(
-            youtube,
+            curlcmd,
             "@if not exist \"%s\\video.mp4\" "
             "%s %s -o %s\\video.mp4 "
             "\"https://www.youtube.com/watch?v=%s\"\n",
-            strchr(output,'\\') + 1,
+            strchr(outfolder,'\\') + 1,
             ytd, strlen(proxyConf) ? proxyConf : "",
-            strchr(output,'\\') + 1, info[1]
+            strchr(outfolder,'\\') + 1, info[1]
         );
         fprintf(
             yp,
             "@if not exist \"%s\\video.mp4\" "
             "%%down%% -o \"%s\\video.mp4\" \"https://www.youtube.com/watch?v=%s\"\n",
-            output, output, info[1]
+            outfolder, outfolder, info[1]
         );
-        if(argc >= 5){
+        if(downall){
             printf("downloading https://www.youtube.com/watch?v=%s\n", info[1]);
-            system(youtube);
+            system(curlcmd);
         }else{
             printf("preparing https://www.youtube.com/watch?v=%s\n", info[1]);
         }
     }else{
         // text based tutorial
-        prepareTextTuroial(url, output, info[0]);
+        prepareTextTuroial(url, outfolder, info[0]);
     }
     
     // tutorial has resource file
     if(strlen(info[2])){
         sprintf(
-            resource,
+            curlcmd,
             "@if not exist \"%s\\%s\" "
             "curl %s -o \"%s\\%s\" \"%sm/%s\"",
-            strchr(output,'\\')+1, info[2],
+            strchr(outfolder,'\\')+1, info[2],
             strlen(proxyConf) ? proxyConf : "",
-            strchr(output,'\\')+1, info[2], find[2], info[2]
+            strchr(outfolder,'\\')+1, info[2], find[2], info[2]
         );
         fprintf(
             fp,
@@ -425,14 +384,14 @@ int main(int argc, char* argv[])
             fp,
             "@if not exist \"%s\\%s\" "
             "curl %s -o \"%s\\%s\" \"%sm/%s\"\n",
-            output, info[2], 
+            outfolder, info[2], 
             strlen(proxyConf) ? proxyConf : "",
-            output, info[2], find[2], info[2]
+            outfolder, info[2], find[2], info[2]
         );
         // has more param to download resource at the same time
-        if(argc >= 5){
+        if(downall){
             printf("downloading %sm/%s\n", find[2], info[2]);
-            system(resource);
+            system(curlcmd);
         }else{
             printf("preparing %sm/%s\n", find[2], info[2]);
         }
@@ -440,4 +399,32 @@ int main(int argc, char* argv[])
     fclose(yp);
     fclose(fp);
     return 0;
+}
+
+// getpage "https://www.pixelmator.com/tutorials/how-to-create-a-neon-sign-effect/"
+// "Design\how-to-create-a-neon-sign-effect" "Resources"
+int main(int argc, char* argv[])
+{
+    char guideid[16]     = {0};
+    char proxy[PXY_CHRS] = {0};
+    char cmd[PXY_CHRS]   = {0};
+    FILE *pp             = NULL;
+    if(argc < 3){
+        printf("usage: %s <url> <output_folder> <resouce_cmd_file>\n", argv[0]);
+        exit(0);
+    }
+    pp = fopen("..\\assets\\proxy.conf","r");
+    if(pp != NULL){
+        fscanf(pp, "%s", proxy);
+        sprintf(proxyConf, "--proxy \"%s\"", proxy);
+        fclose(pp);
+    }
+    // download guide page only
+    if(strstr(argv[2], "guide")){
+        strcpy(guideid, strstr(argv[2], "\\") + 1);
+        getGuide(argv[3], guideid);
+        return 0;
+    }
+    sprintf(cmd, "%s", argc >= 4 && strlen(argv[3]) ? argv[3]: "Resouces");
+    return getTutorial(argv[1], argv[2], cmd, 0);
 }
