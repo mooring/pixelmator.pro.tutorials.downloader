@@ -458,10 +458,10 @@ int getTutorial(char *url, char *outfolder, char *cmd, int downall)
 // "Design\how-to-create-a-neon-sign-effect" "Resources"
 int main(int argc, char* argv[])
 {
-    char guideid[16]     = {0};
-    char proxy[PXY_CHRS] = {0};
-    char cmd[PXY_CHRS]   = {0};
     FILE *pp             = NULL;
+    char guideid[16]     = {0};
+    char cmd[PXY_CHRS]   = {0};
+    char proxy[PXY_CHRS-10] = {0};
     if(argc < 3)
     {
         printf("usage: %s <url> <output_folder> <resouce_cmd_file>\n", argv[0]);
@@ -473,8 +473,8 @@ int main(int argc, char* argv[])
     pp = fopen("..\\assets\\proxy.conf","r");
     if(pp != NULL)
     {
-        fscanf(pp, "%127s", proxy);
-        sprintf(proxyConf, "--proxy \"%s\"", proxy);
+        fscanf(pp, "%110s", proxy);
+        sprintf(proxyConf, "--proxy \"%110s\"", proxy);
         fclose(pp);
     }
     // download guide page only
