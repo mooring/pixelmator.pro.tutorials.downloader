@@ -1,3 +1,6 @@
+#ifndef GETPAGE_H_INCLUDED
+#define GETPAGE_H_INCLUDED
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -21,3 +24,5 @@
 #define CMD_CHRS 1024
 #define TXT_CHRS 4096
 #define OPEN_ERR 1
+
+#endif // GETPAGE_H_INCLUDED
