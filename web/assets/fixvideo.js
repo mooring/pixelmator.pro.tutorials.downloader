@@ -57,10 +57,11 @@ scr.onload = function(){
             // https://help.pixelmator.com/pixelmator-pro/2.4/#805
             if(reg[0].test(href) || reg[1].test(href)){
                 var match = href.match(/pixelmator-pro\/(\d+)/i);
-                var hash  = href.match(/#(\d+)$/)
+                var hash  = href.match(/#(\d+)$/);
+                var guideid = hash ? hash[1] : match ? match[1] : 1219;
                 processed = true;
                 lnk.setAttribute('src', href);
-                lnk.setAttribute('href', '../../guide/'+(hash[1]||match[1])+'/index.html');
+                lnk.setAttribute('href', '../../guide/'+guideid+'/index.html');
                 lnk.setAttribute('target', '_self');
             }else if(/\/tutorials\/(?:[^\/]+\/)/.test(href)){
                 var tu = href.split(/\/tutorials\/(?:[^\/]*\/)/)[1].split('/')[0];

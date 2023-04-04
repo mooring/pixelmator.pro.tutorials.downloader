@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
         fclose(pp);
     }
     // download guide page only
-    if(strstr(argv[2], "guide")){
+    if(strstr(argv[2], "guide\\")){
         strcpy(guideid, strstr(argv[2], "\\") + 1);
         getGuide(argv[3], guideid);
         return 0;
