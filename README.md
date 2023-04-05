@@ -30,14 +30,14 @@ or you can download the packed version list bellow:
 ### Already downloaded tutorials (packed as ISO file)
 
 ### Baidu Cloud Share
-- BaiduCloud1：**2K Video only** [https://pan.baidu.com/s/1gcrtWcgYz8raxY10xjq1CA?pwd=nnth](https://pan.baidu.com/s/1gcrtWcgYz8raxY10xjq1CA?pwd=nnth)
+- BaiduCloud1：**[2K Video only]** [https://pan.baidu.com/s/1gcrtWcgYz8raxY10xjq1CA?pwd=nnth](https://pan.baidu.com/s/1gcrtWcgYz8raxY10xjq1CA?pwd=nnth)
 - Password：nnth
-- BaiduCloud2: **4K Video + Full Guides** [https://pan.baidu.com/s/1UdpC6tdKAMDUtk6GDnYi6Q?pwd=m04d](https://pan.baidu.com/s/1UdpC6tdKAMDUtk6GDnYi6Q?pwd=m04d)
+- BaiduCloud2: **[4K Video + Full Guides]** [https://pan.baidu.com/s/1UdpC6tdKAMDUtk6GDnYi6Q?pwd=m04d](https://pan.baidu.com/s/1UdpC6tdKAMDUtk6GDnYi6Q?pwd=m04d)
 - Password：m04d 
 
 ### Tencent Cloud Share
-- TencentCloud1: **2K Video only** [https://share.weiyun.com/vZXzu2tX](https://share.weiyun.com/vZXzu2tX)
-- TencentCloud2: **4K Video + Full Guides** [https://share.weiyun.com/7R44jt3u](https://share.weiyun.com/7R44jt3u)
+- TencentCloud1: **[2K Video only]** [https://share.weiyun.com/vZXzu2tX](https://share.weiyun.com/vZXzu2tX)
+- TencentCloud2: **[4K Video + Full Guides]** [https://share.weiyun.com/7R44jt3u](https://share.weiyun.com/7R44jt3u)
 
 ### Using the iso file
 mount and open Start.html with your browser 
