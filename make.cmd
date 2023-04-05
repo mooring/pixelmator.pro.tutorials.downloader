@@ -1,7 +1,7 @@
 @echo off
 cls
 set obj_folder=%~dp0obj
-set bin_folder=%~dp0
+set bin_folder=%~dp0bin
 pushd %CD%
 cd %~dp0
 where cl >NUL 2>&1 1>NUL 
@@ -27,7 +27,7 @@ if not exist src/getpage.c (
     goto :EOF
 )
 taskkill /f /im getpage.exe 2>NUL >NUL
-cl /nologo /W2 /Fo%obj_folder%\getpage.obj /Fe%bin_folder%getpage.exe src\getpage.c
+cl /nologo /W2 /Fo%obj_folder%\getpage.obj /Fe%bin_folder%\\getpage.exe src\getpage.c
 if %errorlevel% equ 0 (
     rem cls
     color 02

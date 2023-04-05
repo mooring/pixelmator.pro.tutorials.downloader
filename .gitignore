@@ -1,4 +1,4 @@
-**/obj
+**/obj/
 web/cache
 **/ffmpeg.exe
 **/.vs/
@@ -25,3 +25,4 @@ web/cache
 **/*.bak*
 /web/*.html
 /test/
+/release/

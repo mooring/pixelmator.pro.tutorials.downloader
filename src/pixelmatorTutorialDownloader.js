@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pixelmatorTutorialDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.15
+// @version      0.16
 // @description  download pixcelmator pro tutorial resouces and youtube videos to local disk
 // @author       mooring@codernote.club
 // @match        https://www.pixelmator.com/tutorials/*
@@ -25,9 +25,15 @@ function getCategoryInfo(cmd, collect, init){
         moreless.click();
     }
     if(init){
-        commands.push('cls');
-        commands.push('@set getpage=%25~dp0\\..\\getpage.exe');
-        commands.push(`@echo @set down=..\\yt-dlp --write-thumbnail  --embed-metadata  --cache-dir cache --write-link -f "bv+ba" --progress ${proxy?'--proxy "'+proxy+'"':''} --no-playlist --restrict-filenames --write-subs --audio-quality 10 --merge-output-format "mp4" --sub-langs "en-US.*,zh-Hans.*" --convert-thumbnails png  --ffmpeg-location ..\\ ${init?'>':'>>'} %25~dp0\\${collect||category}_ytb.cmd`);
+        commands.push(`cls`);
+        commands.push(`@set proxy=`); 
+        commands.push(`@set proxy=${proxy}`);
+        commands.push(`@set pxystr=`)
+        commands.push(`@if "%25proxy%25" == "" @echo.>"%25~dp0assets\\proxy.conf"`);
+        commands.push(`@if not "%25proxy%25" == "" @echo %25proxy%25>"%25~dp0assets\\proxy.conf"`);
+        commands.push(`@if not "%25proxy%25" == "" @set pxystr=--proxy "%25proxy%25"`);
+        commands.push(`@set getpage=%25~dp0..\\bin\\getpage.exe`);
+        commands.push(`@echo @set down=..\\bin\\yt-dlp --write-thumbnail  --embed-metadata  --cache-dir cache --write-link -f "bv+ba" --progress %25pxystr%25 --no-playlist --restrict-filenames --write-subs --audio-quality 10 --merge-output-format "mp4" --sub-langs "en-US.*,zh-Hans.*" --convert-thumbnails png  --ffmpeg-location ..\\bin ${init?'>':'>>'} %25~dp0${collect||category}_ytb.cmd`);
         html.push(`<!doctype html>`);
         html.push(`<html lang="en-US">`)
         html.push(`<head>`)
@@ -48,13 +54,13 @@ function getCategoryInfo(cmd, collect, init){
         html.push(`<script>`);
         html.push(`function viewVideo(evt,url){ var img=new Image(); img.onerror=function(){window.open(url.replace("video.mp4","index.html"))};img.onload=function(){window.open(url)};img.src=url.replace(".mp4",".png");}`);
         html.push(`</script></head><body>`);
-        commands.push(`@echo ${proxy||'.'} > "%25~dp0\\assets\\proxy.conf"`);
-        commands.push(`@echo @echo tutorial resource downloader ${init?'>':'>>'} %25~dp0\\${collect||category}_res.cmd`);
-        commands.push(`@echo @title %25cd%25 >> %25~dp0\\${collect||category}_res.cmd`);
-        commands.push(`@echo @title %25cd%25 >> %25~dp0\\${collect||category}_ytb.cmd`);
+        commands.push(`@echo @echo resource downloader ${init?'>':'>>'} %25~dp0${collect||category}_res.cmd`);
+        commands.push(`@echo @title %25cd%25 >> %25~dp0${collect||category}_res.cmd`);
+        commands.push(`@echo @title %25cd%25 >> %25~dp0${collect||category}_ytb.cmd`);
     }
-    commands.push(`@if not exist ${category} mkdir ${category}`);
-    commands.push(`@cd ${category}`);
+    commands.push(`@cd %25~dp0`);
+    commands.push(`@if not exist %25~dp0${category} mkdir %25~dp0${category}`);
+    commands.push(`@cd %25~dp0${category}`);
     let items = document.querySelectorAll('.tutorialsBrowser__mainCategoryList >.tutorialsBrowser__mainItem');
     items.forEach((item,index)=>{
         let img = item.querySelector('.tutorialsThumbnail__image');
@@ -87,7 +93,6 @@ function getCategoryInfo(cmd, collect, init){
         commands.push(`@rem downloading ${encodeURI(x2.join('/').split(' ')[0])}`);
         commands.push(`@if not exist "${img2}" @curl -o "${img2}" "${url2}" 2>NUL`);
         commands.push(`@%25getpage%25 "${lnk}" "${category}\\${pth}" "${collect||category}"`);
-        commands.push(`@cd %25~dp0`);
     });
     if(items.length>0){
         html.push(`</div>`);
@@ -104,13 +109,18 @@ function getCategoryInfo(cmd, collect, init){
 function getGuideCmd(){
     let guides = document.querySelectorAll('.guides-menu a');
     let cmds = [];
-    cmds.push('cls');
-    cmds.push('@set getpage=%25~dp0\\..\\getpage.exe');
-    cmds.push(`@if not exist %25~dp0guide mkdir %25~dp0guide`);
     let lproxy = localStorage.getItem('pixelmatorTutorialDownloader_proxy');
     proxy = prompt("Input proxy string like http://127.0.0.1:8899, if no proxy keep it empty", lproxy || '');
     localStorage.setItem('pixelmatorTutorialDownloader_proxy', proxy||'');
-    cmds.push(`@echo ${proxy||'.'} > "%25~dp0\\assets\\proxy.conf"`);
+    cmds.push(`cls`);
+    cmds.push(`@set proxy=`); 
+    cmds.push(`@set proxy=${proxy}`);
+    cmds.push(`@set pxystr=`)
+    cmds.push(`@if "%25proxy%25" == "" @echo.>"%25~dp0assets\\proxy.conf"`);
+    cmds.push(`@if not "%25proxy%25" == "" @echo %25proxy%25>"%25~dp0assets\\proxy.conf"`);
+    cmds.push(`@if not "%25proxy%25" == "" @set pxystr=--proxy "%25proxy%25"`);
+    cmds.push(`@set getpage=%25~dp0..\\bin\\getpage.exe`);
+    cmds.push(`@if not exist %25~dp0guide mkdir %25~dp0guide`);
     for(let i=0,il=guides.length; i<il; i++){
         let guide = guides[i];
         let match = guide.getAttribute('href').match(/\/pixelmator-pro\/(\d+)/)

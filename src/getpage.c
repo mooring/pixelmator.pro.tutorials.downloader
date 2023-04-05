@@ -388,12 +388,12 @@ int getTutorial(char *url, char *outfolder, char *cmd, int downall)
     // video tutorial
     if(strlen(info[1]))
     {
-        char ytd[] = "..\\..\\yt-dlp --write-thumbnail --embed-metadata"
+        char ytd[] = "..\\..\\bin\\yt-dlp --write-thumbnail --embed-metadata"
                      " --cache-dir cache --write-link -f \"bv+ba\""
                      " --progress --no-playlist --restrict-filenames --write-subs"
                      " --audio-quality 10 --merge-output-format \"mp4\""
                      " --sub-langs \"en-US.*,zh-Hans.*\" --convert-thumbnails png"
-                     " --ffmpeg-location ..\\..\\";
+                     " --ffmpeg-location ..\\..\\bin";
         sprintf(
             curlcmd,
             "@if not exist \"%s\\video.mp4\" "
@@ -484,8 +484,10 @@ int main(int argc, char* argv[])
     pp = fopen("..\\assets\\proxy.conf","r");
     if(pp != NULL)
     {
-        fscanf(pp, "%110s", proxy);
-        sprintf(proxyConf, "--proxy \"%110s\"", proxy);
+        fscanf(pp, "%s", proxy);
+        if(strlen(proxy)){
+            sprintf(proxyConf, "--proxy \"%s\"", proxy);
+        }
         fclose(pp);
     }
     // download guide page only
