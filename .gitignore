@@ -18,10 +18,9 @@ web/cache
 **/Text/
 **/Video/
 **/guide/
-*/*/*.md
+**/*.md
 **/*_res.cmd
 **/*_ytb.cmd
-**/*.cmd
 **/*.bak*
 /web/*.html
 /test/
